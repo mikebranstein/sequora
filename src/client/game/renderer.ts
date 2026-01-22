@@ -89,6 +89,9 @@ export class GameRenderer {
                 container.insertBefore(gameBoard, this.targetContainer);
             }
         }
+        
+        // Initially hide the score element
+        this.scoreElement.style.display = 'none';
     }
     
     private initAudio(): void {
@@ -634,7 +637,21 @@ export class GameRenderer {
     public async animateScore(gameState: GameState): Promise<void> {
         if (this.isAnimating) return;
         this.isAnimating = true;
+        
+        // Show trial score element and add it to header during animation
+        const header = document.querySelector('.game-board-header');
+        if (header && !header.contains(this.scoreElement)) {
+            // Insert trial score between trial info and wave score
+            header.insertBefore(this.scoreElement, this.totalScoreElement);
+        }
+        this.scoreElement.style.display = 'block';
+        this.scoreElement.textContent = 'Score: 0';
+        
         await this.animateScoreCalculation(gameState.tokens, gameState.scoreBreakdown, gameState.targetColors, gameState.bonusEarned);
+        
+        // Hide trial score after animation
+        await this.delay(500);
+        this.scoreElement.style.display = 'none';
         
         // After animation completes, if game is over, show final score
         if (gameState.isGameOver) {
