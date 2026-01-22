@@ -780,8 +780,9 @@ export class GameRenderer {
         for (let i = 0; i < tokens.length; i++) {
             const slot = i + 1;
             
-            // Highlight the current token
+            // Highlight the current token and target token
             this.highlightToken(i);
+            this.highlightTargetToken(i);
             
             if (scoredSlots.has(slot) && canScore) {
                 // This token scored
@@ -799,6 +800,7 @@ export class GameRenderer {
                 
                 await this.delay(300);
                 this.removeTokenHighlight(i);
+                this.removeTargetTokenHighlight(i);
             } else {
                 // This token doesn't score - show skip
                 this.playSkipSound();
@@ -807,12 +809,14 @@ export class GameRenderer {
                 const targetColor = targetColors[i] === 'R' ? 'red' : 'blue';
                 this.messageElement.textContent = `Slot ${slot}: SKIP (${currentColor} token, need ${targetColor})`;
                 this.showSkipIndicator(i);
+                this.showTargetSkipIndicator(i);
                 await this.delay(300);
                 
                 // Mark that we can't score any more tokens after this
                 canScore = false;
                 
                 this.removeTokenHighlight(i);
+                this.removeTargetTokenHighlight(i);
             }
         }
         
@@ -820,6 +824,7 @@ export class GameRenderer {
         if (bonusEarned) {
             await this.delay(300);
             this.highlightBonusToken();
+            this.highlightBonusTargetToken();
             
             // Play special bonus sound
             this.playBonusSound();
@@ -833,6 +838,22 @@ export class GameRenderer {
             
             await this.delay(400);
             this.removeBonusHighlight();
+            this.removeBonusTargetHighlight();
+        } else {
+            // Show bonus as missed
+            await this.delay(300);
+            this.showBonusSkipIndicator();
+            this.showBonusTargetSkipIndicator();
+            
+            // Play skip sound
+            this.playSkipSound();
+            
+            // Show missed bonus message
+            this.messageElement.textContent = 'BONUS: MISSED (not all tokens match)';
+            
+            await this.delay(400);
+            this.removeBonusSkipIndicator();
+            this.removeBonusTargetSkipIndicator();
         }
         
         // Brief pause before returning to normal message
@@ -872,6 +893,43 @@ export class GameRenderer {
         const bonusToken = this.tokensContainer.querySelector('.token-bonus');
         if (bonusToken) {
             bonusToken.parentElement?.classList.remove('scoring');
+        }
+    }
+    
+    private highlightTargetToken(index: number): void {
+        const targetTokens = this.targetContainer.querySelectorAll('.target-token');
+        if (targetTokens[index]) {
+            targetTokens[index].classList.add('scoring');
+        }
+    }
+    
+    private removeTargetTokenHighlight(index: number): void {
+        const targetTokens = this.targetContainer.querySelectorAll('.target-token');
+        if (targetTokens[index]) {
+            targetTokens[index].classList.remove('scoring');
+            targetTokens[index].classList.remove('skipped');
+        }
+    }
+    
+    private showTargetSkipIndicator(index: number): void {
+        const targetTokens = this.targetContainer.querySelectorAll('.target-token');
+        if (targetTokens[index]) {
+            targetTokens[index].classList.remove('scoring');
+            targetTokens[index].classList.add('skipped');
+        }
+    }
+    
+    private highlightBonusTargetToken(): void {
+        const bonusTarget = this.targetContainer.querySelector('.target-bonus');
+        if (bonusTarget) {
+            bonusTarget.classList.add('scoring');
+        }
+    }
+    
+    private removeBonusTargetHighlight(): void {
+        const bonusTarget = this.targetContainer.querySelector('.target-bonus');
+        if (bonusTarget) {
+            bonusTarget.classList.remove('scoring');
         }
     }
     
