@@ -822,7 +822,6 @@ export class GameRenderer {
         
         // Animate bonus if earned
         if (bonusEarned) {
-            await this.delay(300);
             this.highlightBonusToken();
             this.highlightBonusTargetToken();
             
@@ -841,7 +840,6 @@ export class GameRenderer {
             this.removeBonusTargetHighlight();
         } else {
             // Show bonus as missed
-            await this.delay(300);
             this.showBonusSkipIndicator();
             this.showBonusTargetSkipIndicator();
             
