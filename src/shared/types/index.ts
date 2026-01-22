@@ -37,6 +37,7 @@ export interface GameState {
     playHistory: CardPlayHistory[];
     roundScores: number[];
     bonusEarned: boolean;
+    minMovesTarget: number;
 }
 
 // Card play action

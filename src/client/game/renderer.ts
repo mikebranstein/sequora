@@ -464,7 +464,7 @@ export class GameRenderer {
         this.selectedCard = card;
     }
 
-    private renderTargetColors(targetColors: TokenColor[]): void {
+    private renderTargetColors(targetColors: TokenColor[], minMovesTarget?: number): void {
         // Ensure target container is in game board
         const gameBoard = document.querySelector('.game-board');
         if (gameBoard && this.targetContainer.parentNode !== gameBoard) {
@@ -490,10 +490,22 @@ export class GameRenderer {
         bonusTargetToken.className = 'target-token target-bonus';
         bonusTargetToken.textContent = '1x';
         this.targetContainer.appendChild(bonusTargetToken);
+        
+        // Add separator
+        const separator2 = document.createElement('div');
+        separator2.className = 'token-separator';
+        this.targetContainer.appendChild(separator2);
+        
+        // Add minimum moves target (card icon)
+        const minMovesToken = document.createElement('div');
+        minMovesToken.className = 'target-token target-moves';
+        minMovesToken.innerHTML = `<div class="moves-icon">🎴</div><div class="moves-count">${minMovesTarget || '?'}</div>`;
+        minMovesToken.title = `Minimum moves to solve: ${minMovesTarget}`;
+        this.targetContainer.appendChild(minMovesToken);
     }
 
     public render(gameState: GameState): void {
-        this.renderTargetColors(gameState.targetColors);
+        this.renderTargetColors(gameState.targetColors, gameState.minMovesTarget);
         this.renderTokens(gameState.tokens);
         this.renderCards(gameState.hand);
         this.renderHistory(gameState.playHistory);

@@ -66,6 +66,69 @@ export class GameLogic {
 
         return { score, breakdown, bonusEarned };
     }
+    
+    /**
+     * Calculate minimum number of moves to solve puzzle using BFS
+     * This is an NP-complete problem, but with small state space we can brute force it
+     */
+    static calculateMinimumMoves(startTokens: TokenColor[], targetTokens: TokenColor[], availableCards: Card[]): number {
+        // If already solved
+        if (this.arePatternsEqual(startTokens, targetTokens)) {
+            return 0;
+        }
+        
+        // BFS to find shortest path
+        const queue: { tokens: TokenColor[]; moves: number }[] = [{ tokens: startTokens, moves: 0 }];
+        const visited = new Set<string>();
+        visited.add(startTokens.join(''));
+        
+        const maxMoves = 10; // Reasonable upper bound
+        
+        while (queue.length > 0) {
+            const current = queue.shift()!;
+            
+            // Don't explore beyond reasonable depth
+            if (current.moves >= maxMoves) {
+                continue;
+            }
+            
+            // Try each available card
+            for (const card of availableCards) {
+                if (card.requiresTarget) {
+                    // Try card on each position
+                    for (let i = 0; i < current.tokens.length; i++) {
+                        const newTokens = card.execute([...current.tokens], i);
+                        const stateKey = newTokens.join('');
+                        
+                        if (this.arePatternsEqual(newTokens, targetTokens)) {
+                            return current.moves + 1;
+                        }
+                        
+                        if (!visited.has(stateKey)) {
+                            visited.add(stateKey);
+                            queue.push({ tokens: newTokens, moves: current.moves + 1 });
+                        }
+                    }
+                } else {
+                    // Card doesn't require target
+                    const newTokens = card.execute([...current.tokens]);
+                    const stateKey = newTokens.join('');
+                    
+                    if (this.arePatternsEqual(newTokens, targetTokens)) {
+                        return current.moves + 1;
+                    }
+                    
+                    if (!visited.has(stateKey)) {
+                        visited.add(stateKey);
+                        queue.push({ tokens: newTokens, moves: current.moves + 1 });
+                    }
+                }
+            }
+        }
+        
+        // If no solution found within max moves, return max
+        return maxMoves;
+    }
 
     /**
      * Play a card and return the new game state
@@ -156,7 +219,8 @@ export class GameLogic {
             isTargetMatched,
             playHistory: newHistory,
             roundScores: newRoundScores,
-            bonusEarned: isRoundOver ? bonusEarned : false
+            bonusEarned: isRoundOver ? bonusEarned : false,
+            minMovesTarget: currentState.minMovesTarget
         };
     }
 
@@ -178,6 +242,9 @@ export class GameLogic {
         const { starting, target } = this.generatePatterns();
         const { hand, remainingDeck } = this.dealCards(fullDeck, 5);
         
+        // Calculate minimum moves needed with full deck
+        const minMoves = this.calculateMinimumMoves(starting, target, fullDeck);
+        
         return {
             tokens: starting,
             targetColors: target,
@@ -195,7 +262,8 @@ export class GameLogic {
             isTargetMatched: false,
             playHistory: [],
             roundScores: [],
-            bonusEarned: false
+            bonusEarned: false,
+            minMovesTarget: minMoves
         };
     }
 
@@ -221,6 +289,9 @@ export class GameLogic {
         const { hand, remainingDeck } = this.dealCards(fullDeck, 5);
         const nextRound = currentState.currentRound + 1;
         
+        // Calculate minimum moves for new round
+        const minMoves = this.calculateMinimumMoves(starting, target, fullDeck);
+        
         return {
             tokens: starting,
             targetColors: target,
@@ -238,7 +309,8 @@ export class GameLogic {
             isTargetMatched: false,
             playHistory: [],
             roundScores: currentState.roundScores,
-            bonusEarned: false
+            bonusEarned: false,
+            minMovesTarget: minMoves
         };
     }
 }
