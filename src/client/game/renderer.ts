@@ -933,6 +933,34 @@ export class GameRenderer {
         }
     }
     
+    private showBonusSkipIndicator(): void {
+        const bonusToken = this.tokensContainer.querySelector('.token-bonus');
+        if (bonusToken) {
+            bonusToken.parentElement?.classList.add('skipped');
+        }
+    }
+    
+    private removeBonusSkipIndicator(): void {
+        const bonusToken = this.tokensContainer.querySelector('.token-bonus');
+        if (bonusToken) {
+            bonusToken.parentElement?.classList.remove('skipped');
+        }
+    }
+    
+    private showBonusTargetSkipIndicator(): void {
+        const bonusTarget = this.targetContainer.querySelector('.target-bonus');
+        if (bonusTarget) {
+            bonusTarget.classList.add('skipped');
+        }
+    }
+    
+    private removeBonusTargetSkipIndicator(): void {
+        const bonusTarget = this.targetContainer.querySelector('.target-bonus');
+        if (bonusTarget) {
+            bonusTarget.classList.remove('skipped');
+        }
+    }
+    
     private showSkipIndicator(index: number): void {
         const tokenWrappers = this.tokensContainer.querySelectorAll('.token-wrapper');
         if (tokenWrappers[index]) {

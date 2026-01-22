@@ -39,7 +39,7 @@ export class GameLogic {
     /**
      * Calculate score based on consecutive matching tokens from left to right
      */
-    static calculateScore(tokens: TokenColor[], targetColors: TokenColor[]): { score: number; breakdown: { slot: number; multiplier: number; points: number }[]; bonusEarned: boolean } {
+    static calculateScore(tokens: TokenColor[], targetColors: TokenColor[], movesPlayed: number, minMoves: number): { score: number; breakdown: { slot: number; multiplier: number; points: number }[]; bonusEarned: boolean } {
         let score = 0;
         const breakdown: { slot: number; multiplier: number; points: number }[] = [];
 
@@ -58,8 +58,8 @@ export class GameLogic {
             }
         }
         
-        // Award bonus if all 5 tokens match (perfect solution)
-        const bonusEarned = breakdown.length === 5;
+        // Award bonus if all 5 tokens match AND moves played equals minimum moves
+        const bonusEarned = breakdown.length === 5 && movesPlayed === minMoves;
         if (bonusEarned) {
             score += 5; // Bonus: 5 points × 1x multiplier
         }
@@ -172,7 +172,8 @@ export class GameLogic {
         const newHand = currentState.hand.filter(c => c.id !== card.id);
 
         // Calculate score and check if target is matched
-        const { score, breakdown, bonusEarned } = this.calculateScore(newTokens, currentState.targetColors);
+        const movesPlayed = newHistory.length;
+        const { score, breakdown, bonusEarned } = this.calculateScore(newTokens, currentState.targetColors, movesPlayed, currentState.minMovesTarget);
         const isTargetMatched = this.arePatternsEqual(newTokens, currentState.targetColors);
         const isRoundOver = newHand.length === 0 || isTargetMatched;
         
