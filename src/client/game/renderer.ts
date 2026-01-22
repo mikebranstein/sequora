@@ -445,10 +445,14 @@ export class GameRenderer {
         this.menuDropdown.className = 'menu-dropdown hidden';
         this.menuDropdown.innerHTML = `
             <div class="menu-item" data-action="view-deck">View Deck</div>
+            <div class="menu-item" data-action="toggle-logo">Switch Logo Theme</div>
         `;
         
         // Insert menu dropdown after hamburger
         this.hamburgerButton.parentNode?.appendChild(this.menuDropdown);
+        
+        // Apply saved logo theme
+        this.applyLogoTheme();
         
         // Toggle menu on hamburger click
         this.hamburgerButton.addEventListener('click', (e) => {
@@ -463,6 +467,8 @@ export class GameRenderer {
                 const action = target.dataset.action;
                 if (action === 'view-deck') {
                     this.showDeckModal();
+                } else if (action === 'toggle-logo') {
+                    this.toggleLogoTheme();
                 }
                 this.menuDropdown.classList.add('hidden');
             }
@@ -473,6 +479,32 @@ export class GameRenderer {
             this.menuDropdown.classList.add('hidden');
         });
     }
+
+    private toggleLogoTheme(): void {
+        const currentTheme = localStorage.getItem('logoTheme') || 'black';
+        const newTheme = currentTheme === 'black' ? 'white' : 'black';
+        localStorage.setItem('logoTheme', newTheme);
+        this.applyLogoTheme();
+    }
+
+    private applyLogoTheme(): void {
+        const theme = localStorage.getItem('logoTheme') || 'black';
+        const gameLogo = document.querySelector('.game-logo') as HTMLImageElement;
+        const gameHeader = document.querySelector('.game-header') as HTMLElement;
+        
+        if (gameLogo && gameHeader) {
+            if (theme === 'white') {
+                gameLogo.src = 'images/sequora_white.png';
+                gameHeader.classList.add('white-theme');
+                gameHeader.classList.remove('black-theme');
+            } else {
+                gameLogo.src = 'images/sequora_black.png';
+                gameHeader.classList.add('black-theme');
+                gameHeader.classList.remove('white-theme');
+            }
+        }
+    }
+    
     private setupDeckView(): void {
         this.viewDeckButton.textContent = 'View Deck';
         this.viewDeckButton.addEventListener('click', () => {
