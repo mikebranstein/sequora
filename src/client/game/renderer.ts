@@ -168,6 +168,37 @@ export class GameRenderer {
             oscillator.stop(currentTime + duration);
         });
     }
+    
+    private playBonusSound(): void {
+        if (!this.audioContext) return;
+        
+        const currentTime = this.audioContext.currentTime;
+        const duration = 0.8;
+        
+        // Create magical sparkle sound with golden tone
+        const frequencies = [800, 1000, 1200, 1600, 2000];
+        
+        frequencies.forEach((freq, index) => {
+            const oscillator = this.audioContext!.createOscillator();
+            const gainNode = this.audioContext!.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext!.destination);
+            
+            oscillator.frequency.value = freq;
+            oscillator.type = 'sine';
+            
+            const delay = index * 0.05;
+            const volume = 0.15;
+            
+            gainNode.gain.setValueAtTime(0, currentTime + delay);
+            gainNode.gain.linearRampToValueAtTime(volume, currentTime + delay + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + delay + duration);
+            
+            oscillator.start(currentTime + delay);
+            oscillator.stop(currentTime + delay + duration);
+        });
+    }
 
     private getOrCreateElement(id: string, tagName: string = 'div'): HTMLElement {
         let element = document.getElementById(id);
@@ -448,6 +479,17 @@ export class GameRenderer {
             targetToken.textContent = `${this.multipliers[index]}x`;
             this.targetContainer.appendChild(targetToken);
         });
+        
+        // Add separator
+        const separator = document.createElement('div');
+        separator.className = 'token-separator';
+        this.targetContainer.appendChild(separator);
+        
+        // Add bonus target token (golden)
+        const bonusTargetToken = document.createElement('div');
+        bonusTargetToken.className = 'target-token target-bonus';
+        bonusTargetToken.textContent = '1x';
+        this.targetContainer.appendChild(bonusTargetToken);
     }
 
     public render(gameState: GameState): void {
@@ -474,7 +516,7 @@ export class GameRenderer {
     public async animateScore(gameState: GameState): Promise<void> {
         if (this.isAnimating) return;
         this.isAnimating = true;
-        await this.animateScoreCalculation(gameState.tokens, gameState.scoreBreakdown, gameState.targetColors);
+        await this.animateScoreCalculation(gameState.tokens, gameState.scoreBreakdown, gameState.targetColors, gameState.bonusEarned);
         
         // After animation completes, if game is over, show final score
         if (gameState.isGameOver) {
@@ -516,6 +558,23 @@ export class GameRenderer {
             tokenWrapper.appendChild(tokenElement);
             this.tokensContainer.appendChild(tokenWrapper);
         });
+        
+        // Add separator
+        const separator = document.createElement('div');
+        separator.className = 'token-separator';
+        this.tokensContainer.appendChild(separator);
+        
+        // Add bonus token (golden)
+        const bonusWrapper = document.createElement('div');
+        bonusWrapper.className = 'token-wrapper';
+        
+        const bonusToken = document.createElement('div');
+        bonusToken.className = 'token token-bonus';
+        bonusToken.textContent = '5';
+        bonusToken.dataset.index = 'bonus';
+        
+        bonusWrapper.appendChild(bonusToken);
+        this.tokensContainer.appendChild(bonusWrapper);
     }
 
     private renderCards(hand: Card[]): void {
@@ -680,7 +739,7 @@ export class GameRenderer {
         });
     }
 
-    private async animateScoreCalculation(tokens: TokenColor[], breakdown: { slot: number; multiplier: number; points: number }[], targetColors: TokenColor[]): Promise<void> {
+    private async animateScoreCalculation(tokens: TokenColor[], breakdown: { slot: number; multiplier: number; points: number }[], targetColors: TokenColor[], bonusEarned: boolean): Promise<void> {
         // Wait a moment before starting animation
         await this.delay(150);
         
@@ -728,12 +787,31 @@ export class GameRenderer {
             }
         }
         
+        // Animate bonus if earned
+        if (bonusEarned) {
+            await this.delay(300);
+            this.highlightBonusToken();
+            
+            // Play special bonus sound
+            this.playBonusSound();
+            
+            // Show bonus calculation
+            this.messageElement.textContent = '🌟 BONUS: 5 pts × 1x = 5 pts 🌟';
+            
+            // Animate bonus score increment
+            await this.animateScoreIncrement(runningTotal, runningTotal + 5, -1);
+            runningTotal += 5;
+            
+            await this.delay(400);
+            this.removeBonusHighlight();
+        }
+        
         // Brief pause before returning to normal message
         await this.delay(150);
         
         if (breakdown.length === 5) {
             this.playPerfectSound();
-            this.messageElement.textContent = '🎉 PERFECT! Target matched! 🎉';
+            this.messageElement.textContent = bonusEarned ? '🎉 PERFECT! Bonus earned! 🎉' : '🎉 PERFECT! Target matched! 🎉';
         } else {
             this.messageElement.textContent = `Round Score: ${runningTotal}`;
         }
@@ -751,6 +829,20 @@ export class GameRenderer {
         if (tokenWrappers[index]) {
             tokenWrappers[index].classList.remove('scoring');
             tokenWrappers[index].classList.remove('skipped');
+        }
+    }
+    
+    private highlightBonusToken(): void {
+        const bonusToken = this.tokensContainer.querySelector('.token-bonus');
+        if (bonusToken) {
+            bonusToken.parentElement?.classList.add('scoring');
+        }
+    }
+    
+    private removeBonusHighlight(): void {
+        const bonusToken = this.tokensContainer.querySelector('.token-bonus');
+        if (bonusToken) {
+            bonusToken.parentElement?.classList.remove('scoring');
         }
     }
     

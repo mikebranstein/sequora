@@ -39,7 +39,7 @@ export class GameLogic {
     /**
      * Calculate score based on consecutive matching tokens from left to right
      */
-    static calculateScore(tokens: TokenColor[], targetColors: TokenColor[]): { score: number; breakdown: { slot: number; multiplier: number; points: number }[] } {
+    static calculateScore(tokens: TokenColor[], targetColors: TokenColor[]): { score: number; breakdown: { slot: number; multiplier: number; points: number }[]; bonusEarned: boolean } {
         let score = 0;
         const breakdown: { slot: number; multiplier: number; points: number }[] = [];
 
@@ -57,8 +57,14 @@ export class GameLogic {
                 break;
             }
         }
+        
+        // Award bonus if all 5 tokens match (perfect solution)
+        const bonusEarned = breakdown.length === 5;
+        if (bonusEarned) {
+            score += 5; // Bonus: 5 points × 1x multiplier
+        }
 
-        return { score, breakdown };
+        return { score, breakdown, bonusEarned };
     }
 
     /**
@@ -103,7 +109,7 @@ export class GameLogic {
         const newHand = currentState.hand.filter(c => c.id !== card.id);
 
         // Calculate score and check if target is matched
-        const { score, breakdown } = this.calculateScore(newTokens, currentState.targetColors);
+        const { score, breakdown, bonusEarned } = this.calculateScore(newTokens, currentState.targetColors);
         const isTargetMatched = this.arePatternsEqual(newTokens, currentState.targetColors);
         const isRoundOver = newHand.length === 0 || isTargetMatched;
         
@@ -149,7 +155,8 @@ export class GameLogic {
             isRoundOver,
             isTargetMatched,
             playHistory: newHistory,
-            roundScores: newRoundScores
+            roundScores: newRoundScores,
+            bonusEarned: isRoundOver ? bonusEarned : false
         };
     }
 
@@ -187,7 +194,8 @@ export class GameLogic {
             isRoundOver: false,
             isTargetMatched: false,
             playHistory: [],
-            roundScores: []
+            roundScores: [],
+            bonusEarned: false
         };
     }
 
@@ -229,7 +237,8 @@ export class GameLogic {
             isRoundOver: false,
             isTargetMatched: false,
             playHistory: [],
-            roundScores: currentState.roundScores
+            roundScores: currentState.roundScores,
+            bonusEarned: false
         };
     }
 }

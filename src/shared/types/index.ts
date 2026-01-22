@@ -36,6 +36,7 @@ export interface GameState {
     isTargetMatched: boolean;
     playHistory: CardPlayHistory[];
     roundScores: number[];
+    bonusEarned: boolean;
 }
 
 // Card play action
