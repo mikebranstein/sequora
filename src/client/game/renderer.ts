@@ -44,10 +44,37 @@ export class GameRenderer {
         this.nextRoundButton = this.getOrCreateElement('next-round-button', 'button');
         this.multipliers = GameLogic.getMultipliers();
         
+        this.setupGameBoard();
         this.setupRestartButton();
         this.setupDeckView();
         this.setupNextRoundButton();
         this.initAudio();
+    }
+    
+    private setupGameBoard(): void {
+        // Create game board wrapper if it doesn't exist
+        let gameBoard = document.querySelector('.game-board');
+        if (!gameBoard) {
+            gameBoard = document.createElement('div');
+            gameBoard.className = 'game-board';
+            
+            // Create header for integrated info
+            const header = document.createElement('div');
+            header.className = 'game-board-header';
+            
+            // Reorder elements: round info, total score, then round info gets updated
+            header.appendChild(this.roundInfoElement);
+            header.appendChild(this.totalScoreElement);
+            header.appendChild(document.createElement('div')); // Spacer for grid
+            
+            gameBoard.appendChild(header);
+            
+            // Insert before target container
+            const container = document.getElementById('game-container');
+            if (container && this.targetContainer.parentNode === container) {
+                container.insertBefore(gameBoard, this.targetContainer);
+            }
+        }
     }
     
     private initAudio(): void {
@@ -226,6 +253,12 @@ export class GameRenderer {
     }
 
     private renderTargetColors(targetColors: TokenColor[]): void {
+        // Ensure target container is in game board
+        const gameBoard = document.querySelector('.game-board');
+        if (gameBoard && this.targetContainer.parentNode !== gameBoard) {
+            gameBoard.appendChild(this.targetContainer);
+        }
+        
         this.targetContainer.innerHTML = '<div class="target-label">Target:</div>';
         
         targetColors.forEach((color, index) => {
@@ -266,6 +299,12 @@ export class GameRenderer {
     }
 
     private renderTokens(tokens: TokenColor[]): void {
+        // Ensure tokens container is in game board
+        const gameBoard = document.querySelector('.game-board');
+        if (gameBoard && this.tokensContainer.parentNode !== gameBoard) {
+            gameBoard.appendChild(this.tokensContainer);
+        }
+        
         this.tokensContainer.innerHTML = '';
         
         tokens.forEach((token, index) => {
