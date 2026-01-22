@@ -441,6 +441,7 @@ export class GameRenderer {
         this.menuDropdown.innerHTML = `
             <div class="menu-item" data-action="view-deck">View Deck</div>
             <div class="menu-item" data-action="toggle-logo">Switch Logo Theme</div>
+            <div class="menu-item" data-action="quit">Quit</div>
         `;
         
         // Insert menu dropdown after hamburger
@@ -464,6 +465,18 @@ export class GameRenderer {
                     this.showDeckModal();
                 } else if (action === 'toggle-logo') {
                     this.toggleLogoTheme();
+                } else if (action === 'quit') {
+                    // Return to start screen
+                    const gameContainer = document.getElementById('game-container');
+                    const startScreen = document.getElementById('start-screen');
+                    if (gameContainer && startScreen) {
+                        gameContainer.classList.add('hidden');
+                        startScreen.classList.remove('hidden');
+                        // Reload the page to reset game state
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 100);
+                    }
                 }
                 this.menuDropdown.classList.add('hidden');
             }
