@@ -8,7 +8,7 @@
     "build": "npm test && npm run copy:css && tsc && webpack",
     "build:server": "tsc",
     "build:client": "webpack",
-    "copy:css": "node -e \"require('fs').copyFileSync('src/client/styles/main.css', 'public/styles/main.css')\"",
+    "copy:css": "node -e \"require('fs').copyFileSync('src/client/styles/main.css', 'public/styles/main.css'); require('fs').copyFileSync('src/client/styles/start.css', 'public/styles/start.css');\"",
     "watch:css": "chokidar \"src/client/styles/**/*.css\" -c \"npm run copy:css\"",
     "watch:server": "tsc --watch",
     "watch:client": "webpack --watch",

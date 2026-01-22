@@ -75,6 +75,10 @@ h1 {
     width: 100%;
 }
 
+#game-container.hidden {
+    display: none;
+}
+
 /* Game Board - Integrated Gaming Area */
 .game-board {
     background: rgba(0, 0, 0, 0.25);

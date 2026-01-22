@@ -4,10 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sequora</title>
+    <link rel="stylesheet" href="styles/start.css">
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <div id="game-container">
+    <div id="start-screen">
+        <div class="start-container">
+            <div class="start-logo-container">
+                <img src="images/sequora_black.png" alt="Sequora" class="start-logo">
+            </div>
+            <h1 class="start-title">SEQUORA</h1>
+            <p class="start-subtitle">Master the Sequence. Conquer the Colors.</p>
+            <button id="start-button" class="start-button">Start Game</button>
+            <div class="start-features">
+                <div class="feature-item">
+                    <span class="feature-icon">🎯</span>
+                    <span>Strategic Puzzles</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🌊</span>
+                    <span>2 Waves</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <span>Quick Thinking</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="game-container" class="hidden">
         <div class="game-header">
             <img src="images/sequora_black.png" alt="Sequora" class="game-logo">
         </div>
