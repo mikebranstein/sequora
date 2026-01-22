@@ -35,6 +35,7 @@ export interface GameState {
     isRoundOver: boolean;
     isTargetMatched: boolean;
     playHistory: CardPlayHistory[];
+    roundScores: number[];
 }
 
 // Card play action

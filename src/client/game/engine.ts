@@ -76,8 +76,10 @@ export class GameEngine {
             // Animate the score calculation after rendering and wait for it to complete
             await this.renderer.animateScore(this.gameState);
             
-            // Show overlay if game isn't completely over
-            if (!this.gameState.isGameOver) {
+            // Show appropriate overlay
+            if (this.gameState.isGameOver) {
+                this.renderer.showGameOverOverlay(this.gameState);
+            } else {
                 this.renderer.showNextRoundButton(() => this.startNextRound());
             }
         }
@@ -88,6 +90,7 @@ export class GameEngine {
         this.selectedCard = null;
         this.renderer.setSelectedCard(null);
         this.renderer.hideNextRoundButton();
+        this.renderer.hideGameOverOverlay();
         this.render();
     }
     

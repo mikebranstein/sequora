@@ -22,6 +22,7 @@ export class GameRenderer {
     private historyPanel: HTMLElement;
     private hamburgerButton: HTMLElement;
     private menuDropdown: HTMLElement;
+    private gameOverOverlay: HTMLElement;
     private selectedCard: Card | null = null;
     private multipliers: number[];
     private isAnimating: boolean = false;
@@ -50,6 +51,7 @@ export class GameRenderer {
         this.historyPanel = this.getOrCreateElement('history-panel');
         this.hamburgerButton = this.getOrCreateElement('hamburger-menu', 'button');
         this.menuDropdown = this.getOrCreateElement('menu-dropdown');
+        this.gameOverOverlay = this.getOrCreateElement('game-over-overlay');
         this.multipliers = GameLogic.getMultipliers();
         
         this.setupGameBoard();
@@ -58,6 +60,7 @@ export class GameRenderer {
         this.setupDeckView();
         this.setupNextRoundButton();
         this.setupRoundCompleteOverlay();
+        this.setupGameOverOverlay();
         this.initAudio();
     }
     
@@ -249,6 +252,81 @@ export class GameRenderer {
     public hideRoundCompleteOverlay(): void {
         this.roundCompleteOverlay.classList.add('hidden');
     }
+    
+    private setupGameOverOverlay(): void {
+        this.gameOverOverlay.classList.add('hidden');
+    }
+    
+    public showGameOverOverlay(gameState: GameState): void {
+        const won = gameState.totalScore >= gameState.targetScore;
+        const totalCards = gameState.roundScores.length * 5; // 5 cards per round
+        const bestRound = gameState.roundScores.length > 0 ? Math.max(...gameState.roundScores) : 0;
+        const perfectRounds = gameState.roundScores.filter(score => score === 31).length; // Max score is 31 (1+2+4+8+16)
+        
+        this.gameOverOverlay.innerHTML = `
+            <div class="game-over-content">
+                <div class="game-over-header ${won ? 'victory' : 'defeat'}">
+                    ${won ? '🏆 VICTORY! 🏆' : '💔 GAME OVER 💔'}
+                </div>
+                
+                <div class="final-score-display">
+                    <div class="final-score-label">Final Score</div>
+                    <div class="final-score-value ${won ? 'success' : 'failure'}">${gameState.totalScore}</div>
+                    <div class="final-score-target">Target: ${gameState.targetScore}</div>
+                </div>
+                
+                <div class="game-stats">
+                    <div class="stats-header">Game Summary</div>
+                    
+                    <div class="round-breakdown">
+                        ${gameState.roundScores.map((score, index) => `
+                            <div class="round-stat ${score === bestRound ? 'best-round' : ''}">
+                                <div class="round-stat-label">
+                                    Round ${index + 1}
+                                    ${score === bestRound && gameState.roundScores.length > 1 ? '<span class="badge">Best!</span>' : ''}
+                                    ${score === 31 ? '<span class="badge perfect">Perfect!</span>' : ''}
+                                </div>
+                                <div class="round-stat-value">${score} pts</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="additional-stats">
+                        <div class="stat-box">
+                            <div class="stat-box-value">${totalCards}</div>
+                            <div class="stat-box-label">Cards Played</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value">${perfectRounds}</div>
+                            <div class="stat-box-label">Perfect Rounds</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value">${Math.round((gameState.totalScore / gameState.targetScore) * 100)}%</div>
+                            <div class="stat-box-label">Target Reached</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="play-again-button">Play Again</button>
+            </div>
+        `;
+        
+        this.gameOverOverlay.classList.remove('hidden');
+        
+        // Add click handler to play again button
+        const playAgainButton = this.gameOverOverlay.querySelector('.play-again-button');
+        if (playAgainButton) {
+            playAgainButton.addEventListener('click', () => {
+                this.hideGameOverOverlay();
+                this.onRestartClick();
+            });
+        }
+    }
+    
+    public hideGameOverOverlay(): void {
+        this.gameOverOverlay.classList.add('hidden');
+    }
+    
     private setupHamburgerMenu(): void {
         // Setup hamburger button
         this.hamburgerButton.innerHTML = '☰';

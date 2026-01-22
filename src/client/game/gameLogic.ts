@@ -110,6 +110,9 @@ export class GameLogic {
         // Calculate new total score
         const newTotalScore = isRoundOver ? currentState.totalScore + score : currentState.totalScore;
         
+        // Update round scores array when round ends
+        const newRoundScores = isRoundOver ? [...currentState.roundScores, score] : currentState.roundScores;
+        
         // Check if game is completely over
         const isGameOver = isRoundOver && (currentState.currentRound >= currentState.maxRounds || newTotalScore >= currentState.targetScore);
 
@@ -145,7 +148,8 @@ export class GameLogic {
             targetScore: currentState.targetScore,
             isRoundOver,
             isTargetMatched,
-            playHistory: newHistory
+            playHistory: newHistory,
+            roundScores: newRoundScores
         };
     }
 
@@ -182,7 +186,8 @@ export class GameLogic {
             targetScore: 90,
             isRoundOver: false,
             isTargetMatched: false,
-            playHistory: []
+            playHistory: [],
+            roundScores: []
         };
     }
 
@@ -223,7 +228,8 @@ export class GameLogic {
             targetScore: currentState.targetScore,
             isRoundOver: false,
             isTargetMatched: false,
-            playHistory: []
+            playHistory: [],
+            roundScores: currentState.roundScores
         };
     }
 }
