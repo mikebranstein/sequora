@@ -977,16 +977,25 @@ class GameRenderer {
         const theme = localStorage.getItem('logoTheme') || 'black';
         const gameLogo = document.querySelector('.game-logo');
         const gameHeader = document.querySelector('.game-header');
+        const gameBoardHeader = document.querySelector('.game-board-header');
         if (gameLogo && gameHeader) {
             if (theme === 'white') {
                 gameLogo.src = 'images/sequora_white.png';
                 gameHeader.classList.add('white-theme');
                 gameHeader.classList.remove('black-theme');
+                if (gameBoardHeader) {
+                    gameBoardHeader.classList.add('white-theme');
+                    gameBoardHeader.classList.remove('black-theme');
+                }
             }
             else {
                 gameLogo.src = 'images/sequora_black.png';
                 gameHeader.classList.add('black-theme');
                 gameHeader.classList.remove('white-theme');
+                if (gameBoardHeader) {
+                    gameBoardHeader.classList.add('black-theme');
+                    gameBoardHeader.classList.remove('white-theme');
+                }
             }
         }
     }
