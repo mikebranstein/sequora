@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Flip Card Game</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Token Flip Puzzle</h1>
+        <div class="header-controls">
+            <div id="score-display" class="score-display">Score: 0</div>
+            <button id="view-deck-button" class="view-deck-button">View Deck</button>
+        </div>
+        <div id="message" class="message">Match the target colors to score points!</div>
+        <div id="target-container" class="target-container"></div>
+        <div id="tokens-container" class="tokens-container"></div>
+        <div id="cards-container" class="cards-container"></div>
+        <button id="restart-button" class="restart-button">Restart Game</button>
+        <div id="deck-modal" class="deck-modal hidden">
+            <div class="deck-modal-content">
+                <div class="deck-modal-header">
+                    <h2>Full Deck</h2>
+                    <button id="close-deck-button" class="close-deck-button">&times;</button>
+                </div>
+                <div id="deck-cards-container" class="deck-cards-container"></div>
+            </div>
+        </div>
+    </div>
+    <script src="js/bundle.js"></script>
+</body>
+</html>
