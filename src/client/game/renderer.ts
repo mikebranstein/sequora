@@ -18,6 +18,7 @@ export class GameRenderer {
     private closeDeckButton: HTMLElement;
     private roundInfoElement: HTMLElement;
     private nextRoundButton: HTMLElement;
+    private roundCompleteOverlay: HTMLElement;
     private selectedCard: Card | null = null;
     private multipliers: number[];
     private isAnimating: boolean = false;
@@ -42,12 +43,14 @@ export class GameRenderer {
         this.closeDeckButton = this.getOrCreateElement('close-deck-button', 'button');
         this.roundInfoElement = this.getOrCreateElement('round-info');
         this.nextRoundButton = this.getOrCreateElement('next-round-button', 'button');
+        this.roundCompleteOverlay = this.getOrCreateElement('round-complete-overlay');
         this.multipliers = GameLogic.getMultipliers();
         
         this.setupGameBoard();
         this.setupRestartButton();
         this.setupDeckView();
         this.setupNextRoundButton();
+        this.setupRoundCompleteOverlay();
         this.initAudio();
     }
     
@@ -180,17 +183,71 @@ export class GameRenderer {
         this.nextRoundButton.classList.add('hidden');
     }
     
+    private setupRoundCompleteOverlay(): void {
+        this.roundCompleteOverlay.classList.add('hidden');
+        
+        // Close overlay when clicking on the backdrop
+        this.roundCompleteOverlay.addEventListener('click', (e) => {
+            if (e.target === this.roundCompleteOverlay) {
+                this.hideRoundCompleteOverlay();
+            }
+        });
+    }
+    
     public showNextRoundButton(callback: () => void): void {
-        this.nextRoundButton.classList.remove('hidden');
-        // Remove old listeners by cloning and replacing
-        const newButton = this.nextRoundButton.cloneNode(true) as HTMLElement;
-        this.nextRoundButton.parentNode?.replaceChild(newButton, this.nextRoundButton);
-        this.nextRoundButton = newButton;
-        this.nextRoundButton.addEventListener('click', callback);
+        // This method is kept for compatibility but now shows the overlay
+        this.showRoundCompleteOverlay(callback);
+    }
+    
+    public showRoundCompleteOverlay(callback: () => void): void {
+        // Get current game state info from the DOM
+        const roundScoreText = this.scoreElement.textContent || 'Round: 0';
+        const roundScore = parseInt(roundScoreText.split(':')[1]) || 0;
+        const totalScoreText = this.totalScoreElement.textContent || 'Total: 0/90';
+        const totalParts = totalScoreText.match(/\d+/g) || ['0', '90'];
+        const totalScore = parseInt(totalParts[0]);
+        const targetScore = parseInt(totalParts[1]);
+        const progressPercent = Math.min(100, (totalScore / targetScore) * 100);
+        
+        this.roundCompleteOverlay.innerHTML = `
+            <div class="round-complete-content">
+                <h2>Round Complete!</h2>
+                <div class="round-stats">
+                    <div class="stat-item round-earned">
+                        <div class="stat-label">Points Earned</div>
+                        <div class="stat-value">+${roundScore}</div>
+                    </div>
+                    <div class="stat-item total-progress">
+                        <div class="stat-label">Total Progress</div>
+                        <div class="stat-value">${totalScore} / ${targetScore}</div>
+                        <div class="progress-bar-large">
+                            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-button">Continue to Next Round</button>
+            </div>
+        `;
+        
+        this.roundCompleteOverlay.classList.remove('hidden');
+        
+        // Add click handler to continue button
+        const continueButton = this.roundCompleteOverlay.querySelector('.continue-button');
+        if (continueButton) {
+            continueButton.addEventListener('click', () => {
+                this.hideRoundCompleteOverlay();
+                callback();
+            });
+        }
     }
     
     public hideNextRoundButton(): void {
         this.nextRoundButton.classList.add('hidden');
+        this.hideRoundCompleteOverlay();
+    }
+    
+    public hideRoundCompleteOverlay(): void {
+        this.roundCompleteOverlay.classList.add('hidden');
     }
 
     private setupDeckView(): void {

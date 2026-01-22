@@ -67,16 +67,17 @@ export class GameEngine {
         }
     }
 
-    private playCard(card: Card, targetIndex?: number): void {
+    private async playCard(card: Card, targetIndex?: number): Promise<void> {
         this.gameState = GameLogic.playCard(this.gameState, card, targetIndex);
         this.render();
         
-        // Animate the score calculation after rendering
-        this.renderer.animateScore(this.gameState);
+        // Animate the score calculation after rendering and wait for it to complete
+        await this.renderer.animateScore(this.gameState);
         
         // Check if round is over but game isn't completely over
+        // Only show overlay after animation completes
         if (this.gameState.isRoundOver && !this.gameState.isGameOver) {
-            // Show "Next Round" button
+            // Show "Next Round" overlay
             this.renderer.showNextRoundButton(() => this.startNextRound());
         }
     }
