@@ -187,13 +187,6 @@ export class GameRenderer {
     
     private setupRoundCompleteOverlay(): void {
         this.roundCompleteOverlay.classList.add('hidden');
-        
-        // Close overlay when clicking on the backdrop
-        this.roundCompleteOverlay.addEventListener('click', (e) => {
-            if (e.target === this.roundCompleteOverlay) {
-                this.hideRoundCompleteOverlay();
-            }
-        });
     }
     
     public showNextRoundButton(callback: () => void): void {
