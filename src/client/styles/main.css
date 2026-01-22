@@ -1334,6 +1334,7 @@ h1 {
 .hamburger-menu {
     position: absolute;
     left: 20px;
+    top: 20px;
     background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
@@ -1362,8 +1363,8 @@ h1 {
 
 .menu-dropdown {
     position: absolute;
-    top: 70px;
-    left: 20px;
+    top: 20px;
+    left: 75px;
     background: rgba(0, 0, 0, 0.9);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 10px;
