@@ -655,9 +655,9 @@ export class GameRenderer {
         
         if (breakdown.length === 5) {
             this.playPerfectSound();
-            this.messageElement.textContent = '🎉 PERFECT! All tokens blue! 🎉';
+            this.messageElement.textContent = '🎉 PERFECT! Target matched! 🎉';
         } else {
-            this.messageElement.textContent = `Current Score: ${runningTotal}`;
+            this.messageElement.textContent = `Round Score: ${runningTotal}`;
         }
     }
     
