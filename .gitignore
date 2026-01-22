@@ -6,6 +6,9 @@ dist/
 public/js/bundle.js
 public/js/bundle.js.map
 
+# code coverage outputs
+coverage/
+
 # TypeScript
 *.tsbuildinfo
 
