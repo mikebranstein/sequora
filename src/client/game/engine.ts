@@ -80,7 +80,14 @@ export class GameEngine {
             if (this.gameState.isGameOver) {
                 this.renderer.showGameOverOverlay(this.gameState);
             } else {
-                this.renderer.showNextTrialButton(() => this.startNextTrial());
+                // Check if wave is complete (finished all trials in wave)
+                const isWaveComplete = this.gameState.currentTrial >= this.gameState.maxTrials;
+                
+                if (isWaveComplete) {
+                    this.renderer.showWaveCompleteOverlay(this.gameState, () => this.startNextTrial());
+                } else {
+                    this.renderer.showNextTrialButton(() => this.startNextTrial());
+                }
             }
         }
     }
@@ -90,6 +97,7 @@ export class GameEngine {
         this.selectedCard = null;
         this.renderer.setSelectedCard(null);
         this.renderer.hideNextTrialButton();
+        this.renderer.hideWaveCompleteOverlay();
         this.renderer.hideGameOverOverlay();
         this.render();
     }

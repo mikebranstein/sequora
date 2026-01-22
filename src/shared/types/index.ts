@@ -31,13 +31,16 @@ export interface GameState {
     currentTrial: number;
     currentWave: number;
     totalScore: number;
+    waveScore: number;
     maxTrials: number;
     maxWaves: number;
     targetScore: number;
+    waveTargetScore: number;
     isTrialOver: boolean;
     isTargetMatched: boolean;
     playHistory: CardPlayHistory[];
     trialScores: number[];
+    waveScores: number[];
     bonusEarned: boolean;
     minMovesTarget: number;
 }

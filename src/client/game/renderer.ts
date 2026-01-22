@@ -19,6 +19,7 @@ export class GameRenderer {
     private trialInfoElement: HTMLElement;
     private nextTrialButton: HTMLElement;
     private trialCompleteOverlay: HTMLElement;
+    private waveCompleteOverlay: HTMLElement;
     private historyPanel: HTMLElement;
     private hamburgerButton: HTMLElement;
     private menuDropdown: HTMLElement;
@@ -48,6 +49,7 @@ export class GameRenderer {
         this.trialInfoElement = this.getOrCreateElement('trial-info');
         this.nextTrialButton = this.getOrCreateElement('next-trial-button', 'button');
         this.trialCompleteOverlay = this.getOrCreateElement('trial-complete-overlay');
+        this.waveCompleteOverlay = this.getOrCreateElement('wave-complete-overlay');
         this.historyPanel = this.getOrCreateElement('history-panel');
         this.hamburgerButton = this.getOrCreateElement('hamburger-menu', 'button');
         this.menuDropdown = this.getOrCreateElement('menu-dropdown');
@@ -60,6 +62,7 @@ export class GameRenderer {
         this.setupDeckView();
         this.setupNextTrialButton();
         this.setupTrialCompleteOverlay();
+        this.setupWaveCompleteOverlay();
         this.setupGameOverOverlay();
         this.initAudio();
     }
@@ -237,11 +240,13 @@ export class GameRenderer {
         // Get current game state info from the DOM
         const trialScoreText = this.scoreElement.textContent || 'Trial: 0';
         const trialScore = parseInt(trialScoreText.split(':')[1]) || 0;
+        const trialInfoText = this.trialInfoElement.textContent || 'W1 T1/3';
+        const waveMatch = trialInfoText.match(/W(\d+)/);
+        const currentWave = waveMatch ? parseInt(waveMatch[1]) : 1;
         const totalScoreText = this.totalScoreElement.textContent || 'Total: 0/180';
         const totalParts = totalScoreText.match(/\d+/g) || ['0', '180'];
         const totalScore = parseInt(totalParts[0]);
         const targetScore = parseInt(totalParts[1]);
-        const progressPercent = Math.min(100, (totalScore / targetScore) * 100);
         
         this.trialCompleteOverlay.innerHTML = `
             <div class="trial-complete-content">
@@ -252,10 +257,10 @@ export class GameRenderer {
                         <div class="stat-value">+${trialScore}</div>
                     </div>
                     <div class="stat-item total-progress">
-                        <div class="stat-label">Total Progress</div>
+                        <div class="stat-label">Wave ${currentWave} Progress</div>
                         <div class="stat-value">${totalScore} / ${targetScore}</div>
                         <div class="progress-bar-large">
-                            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                            <div class="progress-fill" style="width: ${Math.min(100, (totalScore / targetScore) * 100)}%"></div>
                         </div>
                     </div>
                 </div>
@@ -284,6 +289,68 @@ export class GameRenderer {
         this.trialCompleteOverlay.classList.add('hidden');
     }
     
+    private setupWaveCompleteOverlay(): void {
+        this.waveCompleteOverlay.classList.add('hidden');
+    }
+    
+    public showWaveCompleteOverlay(gameState: GameState, callback: () => void): void {
+        const waveNumber = gameState.currentWave;
+        const waveScore = gameState.waveScore;
+        const waveTarget = gameState.waveTargetScore;
+        const totalScore = gameState.totalScore;
+        const overallTarget = gameState.targetScore;
+        const progressPercent = Math.min(100, (totalScore / overallTarget) * 100);
+        const waveMet = waveScore >= waveTarget;
+        
+        this.waveCompleteOverlay.innerHTML = `
+            <div class="wave-complete-content">
+                <h2>🌊 Wave ${waveNumber} Complete! 🌊</h2>
+                <div class="wave-summary">
+                    <div class="wave-score-display ${waveMet ? 'wave-success' : 'wave-partial'}">
+                        <div class="wave-score-label">Wave Score</div>
+                        <div class="wave-score-value">${waveScore}</div>
+                        <div class="wave-score-target">Target: ${waveTarget}</div>
+                        ${waveMet ? '<div class="wave-badge">✨ Target Met! ✨</div>' : '<div class="wave-badge-miss">Keep Going!</div>'}
+                    </div>
+                    
+                    <div class="trial-results">
+                        <div class="trial-results-header">Trial Results</div>
+                        ${gameState.trialScores.map((score, index) => `
+                            <div class="trial-result-item">
+                                <span class="trial-result-label">Trial ${index + 1}</span>
+                                <span class="trial-result-score">${score} pts</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="overall-progress">
+                        <div class="overall-label">Overall Progress</div>
+                        <div class="overall-value">${totalScore} / ${overallTarget}</div>
+                        <div class="progress-bar-large">
+                            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-button">${waveNumber < gameState.maxWaves ? 'Continue to Next Wave' : 'View Results'}</button>
+            </div>
+        `;
+        
+        this.waveCompleteOverlay.classList.remove('hidden');
+        
+        // Add click handler to continue button
+        const continueButton = this.waveCompleteOverlay.querySelector('.continue-button');
+        if (continueButton) {
+            continueButton.addEventListener('click', () => {
+                this.hideWaveCompleteOverlay();
+                callback();
+            });
+        }
+    }
+    
+    public hideWaveCompleteOverlay(): void {
+        this.waveCompleteOverlay.classList.add('hidden');
+    }
+    
     private setupGameOverOverlay(): void {
         this.gameOverOverlay.classList.add('hidden');
     }
@@ -309,17 +376,17 @@ export class GameRenderer {
                 <div class="game-stats">
                     <div class="stats-header">Game Summary</div>
                     
-                    <div class="trial-breakdown">
-                        ${gameState.trialScores.map((score, index) => `
-                            <div class="trial-stat ${score === bestTrial ? 'best-trial' : ''}">
-                                <div class="trial-stat-label">
-                                    Wave ${Math.floor(index / gameState.maxTrials) + 1}, Trial ${(index % gameState.maxTrials) + 1}
-                                    ${score === bestTrial && gameState.trialScores.length > 1 ? '<span class="badge">Best!</span>' : ''}
-                                    ${score === 31 ? '<span class="badge perfect">Perfect!</span>' : ''}
-                                </div>
-                                <div class="trial-stat-value">${score} pts</div>
+                    <div class="wave-summary-section">
+                        ${gameState.waveScores.map((waveScore, waveIndex) => `
+                            <div class="wave-summary-item">
+                                <div class="wave-summary-header">Wave ${waveIndex + 1}: ${waveScore} pts</div>
                             </div>
                         `).join('')}
+                        ${gameState.currentWave <= gameState.maxWaves && gameState.trialScores.length > 0 ? `
+                            <div class="wave-summary-item current-wave">
+                                <div class="wave-summary-header">Wave ${gameState.currentWave}: ${gameState.waveScore} pts</div>
+                            </div>
+                        ` : ''}
                     </div>
                     
                     <div class="additional-stats">
@@ -520,7 +587,7 @@ export class GameRenderer {
         // Always show total score in separate area
         this.renderTotalScore(gameState.totalScore, gameState.targetScore, false);
         
-        this.renderTrialInfo(gameState.currentTrial, gameState.currentWave, gameState.maxTrials, gameState.totalScore, gameState.targetScore);
+        this.renderTrialInfo(gameState.currentTrial, gameState.currentWave, gameState.maxTrials, gameState.waveScore, gameState.waveTargetScore);
         this.renderMessage(gameState.message, gameState.isGameOver);
         this.renderDeck(gameState.deck, gameState.hand);
     }
@@ -705,11 +772,11 @@ export class GameRenderer {
         }
     }
     
-    private renderTrialInfo(currentTrial: number, currentWave: number, maxTrials: number, totalScore: number, targetScore: number): void {
+    private renderTrialInfo(currentTrial: number, currentWave: number, maxTrials: number, waveScore: number, waveTargetScore: number): void {
         this.trialInfoElement.innerHTML = `
             <div class="trial-number">W${currentWave} T${currentTrial}/${maxTrials}</div>
             <div class="progress-bar">
-                <div class="progress-fill" style="width: ${Math.min(100, (totalScore / targetScore) * 100)}%"></div>
+                <div class="progress-fill" style="width: ${Math.min(100, (waveScore / waveTargetScore) * 100)}%"></div>
             </div>
         `;
     }

@@ -177,14 +177,21 @@ export class GameLogic {
         const isTargetMatched = this.arePatternsEqual(newTokens, currentState.targetColors);
         const isTrialOver = newHand.length === 0 || isTargetMatched;
         
-        // Calculate new total score
+        // Calculate new wave and total scores
+        const newWaveScore = isTrialOver ? currentState.waveScore + score : currentState.waveScore;
         const newTotalScore = isTrialOver ? currentState.totalScore + score : currentState.totalScore;
         
         // Update trial scores array when trial ends
         const newTrialScores = isTrialOver ? [...currentState.trialScores, score] : currentState.trialScores;
         
-        // Check if game is completely over (all waves completed or target score reached)
-        const isGameOver = isTrialOver && ((currentState.currentTrial >= currentState.maxTrials && currentState.currentWave >= currentState.maxWaves) || newTotalScore >= currentState.targetScore);
+        // Check if wave is complete
+        const isWaveComplete = isTrialOver && currentState.currentTrial >= currentState.maxTrials;
+        
+        // Update wave scores when wave ends
+        const newWaveScores = isWaveComplete ? [...currentState.waveScores, newWaveScore] : currentState.waveScores;
+        
+        // Check if game is completely over (all waves completed)
+        const isGameOver = isWaveComplete && currentState.currentWave >= currentState.maxWaves;
 
         let message = '';
         if (isTargetMatched) {
@@ -215,13 +222,16 @@ export class GameLogic {
             currentTrial: currentState.currentTrial,
             currentWave: currentState.currentWave,
             totalScore: newTotalScore,
+            waveScore: newWaveScore,
             maxTrials: currentState.maxTrials,
             maxWaves: currentState.maxWaves,
             targetScore: currentState.targetScore,
+            waveTargetScore: currentState.waveTargetScore,
             isTrialOver,
             isTargetMatched,
             playHistory: newHistory,
             trialScores: newTrialScores,
+            waveScores: newWaveScores,
             bonusEarned: isTrialOver ? bonusEarned : false,
             minMovesTarget: currentState.minMovesTarget
         };
@@ -256,17 +266,20 @@ export class GameLogic {
             isGameOver: false,
             score: 0,
             scoreBreakdown: [],
-            message: 'Wave 1, Trial 1 of 3 - Reach 180 points to win!',
+            message: 'Wave 1, Trial 1 of 3 - Reach 90 points this wave!',
             currentTrial: 1,
             currentWave: 1,
             totalScore: 0,
+            waveScore: 0,
             maxTrials: 3,
             maxWaves: 2,
             targetScore: 180,
+            waveTargetScore: 90,
             isTrialOver: false,
             isTargetMatched: false,
             playHistory: [],
             trialScores: [],
+            waveScores: [],
             bonusEarned: false,
             minMovesTarget: minMoves
         };
@@ -296,11 +309,15 @@ export class GameLogic {
         // Determine next trial and wave
         let nextTrial = currentState.currentTrial + 1;
         let nextWave = currentState.currentWave;
+        let newWaveScore = currentState.waveScore;
+        let newTrialScores = currentState.trialScores;
         
         // Move to next wave if we've completed all trials in current wave
         if (nextTrial > currentState.maxTrials) {
             nextTrial = 1;
             nextWave++;
+            newWaveScore = 0; // Reset wave score for new wave
+            newTrialScores = []; // Reset trial scores for new wave
         }
         
         // Calculate minimum moves for new trial
@@ -314,17 +331,20 @@ export class GameLogic {
             isGameOver: false,
             score: 0,
             scoreBreakdown: [],
-            message: `Wave ${nextWave}, Trial ${nextTrial} of ${currentState.maxTrials} - ${currentState.totalScore}/${currentState.targetScore} points`,
+            message: `Wave ${nextWave}, Trial ${nextTrial} of ${currentState.maxTrials} - ${newWaveScore}/${currentState.waveTargetScore} points`,
             currentTrial: nextTrial,
             currentWave: nextWave,
             totalScore: currentState.totalScore,
+            waveScore: newWaveScore,
             maxTrials: currentState.maxTrials,
             maxWaves: currentState.maxWaves,
             targetScore: currentState.targetScore,
+            waveTargetScore: currentState.waveTargetScore,
             isTrialOver: false,
             isTargetMatched: false,
             playHistory: [],
-            trialScores: currentState.trialScores,
+            trialScores: newTrialScores,
+            waveScores: currentState.waveScores,
             bonusEarned: false,
             minMovesTarget: minMoves
         };
