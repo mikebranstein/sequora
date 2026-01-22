@@ -58,14 +58,13 @@ export class GameRenderer {
             gameBoard = document.createElement('div');
             gameBoard.className = 'game-board';
             
-            // Create header for integrated info
+            // Create header for integrated info - single line: round info | round score | total score
             const header = document.createElement('div');
             header.className = 'game-board-header';
             
-            // Reorder elements: round info, total score, then round info gets updated
             header.appendChild(this.roundInfoElement);
+            header.appendChild(this.scoreElement);
             header.appendChild(this.totalScoreElement);
-            header.appendChild(document.createElement('div')); // Spacer for grid
             
             gameBoard.appendChild(header);
             
@@ -399,7 +398,7 @@ export class GameRenderer {
     }
 
     private renderScore(score: number): void {
-        this.scoreElement.textContent = `Round Score: ${score}`;
+        this.scoreElement.textContent = `Round: ${score}`;
     }
     
     private renderTotalScore(totalScore: number, targetScore: number, isGameOver: boolean): void {
@@ -410,13 +409,13 @@ export class GameRenderer {
             const targetMet = totalScore >= targetScore;
             if (targetMet) {
                 this.totalScoreElement.classList.add('target-met');
-                this.totalScoreElement.textContent = `🏆 Final Score: ${totalScore}/${targetScore} 🏆`;
+                this.totalScoreElement.textContent = `🏆 ${totalScore}/${targetScore} 🏆`;
             } else {
                 this.totalScoreElement.classList.add('target-missed');
-                this.totalScoreElement.textContent = `Final Score: ${totalScore}/${targetScore}`;
+                this.totalScoreElement.textContent = `Final: ${totalScore}/${targetScore}`;
             }
         } else {
-            this.totalScoreElement.textContent = `Total Score: ${totalScore} / ${targetScore}`;
+            this.totalScoreElement.textContent = `Total: ${totalScore}/${targetScore}`;
         }
     }
     
@@ -433,7 +432,7 @@ export class GameRenderer {
     
     private renderRoundInfo(currentRound: number, maxRounds: number, totalScore: number, targetScore: number): void {
         this.roundInfoElement.innerHTML = `
-            <div class="round-number">Round ${currentRound} of ${maxRounds}</div>
+            <div class="round-number">R${currentRound}/${maxRounds}</div>
             <div class="progress-bar">
                 <div class="progress-fill" style="width: ${Math.min(100, (totalScore / targetScore) * 100)}%"></div>
             </div>
