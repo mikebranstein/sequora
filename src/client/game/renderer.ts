@@ -74,12 +74,11 @@ export class GameRenderer {
             gameBoard = document.createElement('div');
             gameBoard.className = 'game-board';
             
-            // Create header for integrated info - single line: trial info | trial score | total score
+            // Create header for integrated info - wave/trial indicators and wave score
             const header = document.createElement('div');
             header.className = 'game-board-header';
             
             header.appendChild(this.trialInfoElement);
-            header.appendChild(this.scoreElement);
             header.appendChild(this.totalScoreElement);
             
             gameBoard.appendChild(header);
@@ -253,7 +252,7 @@ export class GameRenderer {
                 <h2>Trial Complete!</h2>
                 <div class="trial-stats">
                     <div class="stat-item trial-earned">
-                        <div class="stat-label">Points Earned</div>
+                        <div class="stat-label">Score Earned</div>
                         <div class="stat-value">+${trialScore}</div>
                     </div>
                     <div class="stat-item total-progress">
@@ -780,7 +779,7 @@ export class GameRenderer {
     }
 
     private renderScore(score: number): void {
-        this.scoreElement.textContent = `Trial: ${score}`;
+        this.scoreElement.textContent = `Score: ${score}`;
     }
     
     private renderTotalScore(totalScore: number, targetScore: number, isGameOver: boolean): void {
