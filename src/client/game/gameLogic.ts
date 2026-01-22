@@ -88,15 +88,32 @@ export class GameLogic {
         // Remove card from hand
         const newHand = currentState.hand.filter(c => c.id !== card.id);
 
-        // Calculate score and check if game is over
+        // Calculate score and check if target is matched
         const { score, breakdown } = this.calculateScore(newTokens, currentState.targetColors);
-        const isGameOver = newHand.length === 0;
+        const isTargetMatched = this.arePatternsEqual(newTokens, currentState.targetColors);
+        const isRoundOver = newHand.length === 0 || isTargetMatched;
+        
+        // Calculate new total score
+        const newTotalScore = isRoundOver ? currentState.totalScore + score : currentState.totalScore;
+        
+        // Check if game is completely over
+        const isGameOver = isRoundOver && (currentState.currentRound >= currentState.maxRounds || newTotalScore >= currentState.targetScore);
 
         let message = '';
-        if (isGameOver) {
-            message = 'Game Over! Calculating final score...';
+        if (isTargetMatched) {
+            message = `Perfect! Target matched!`;
+        } else if (isRoundOver) {
+            message = `Round ${currentState.currentRound} complete!`;
         } else {
             message = `Played ${card.name}`;
+        }
+        
+        if (isGameOver) {
+            if (newTotalScore >= currentState.targetScore) {
+                message = `🎉 VICTORY! Final Score: ${newTotalScore}/${currentState.targetScore} - Target Achieved! 🎉`;
+            } else {
+                message = `Game Over - Final Score: ${newTotalScore}/${currentState.targetScore} - Target Not Met`;
+            }
         }
 
         return {
@@ -107,7 +124,13 @@ export class GameLogic {
             isGameOver,
             score,
             scoreBreakdown: breakdown,
-            message
+            message,
+            currentRound: currentState.currentRound,
+            totalScore: newTotalScore,
+            maxRounds: currentState.maxRounds,
+            targetScore: currentState.targetScore,
+            isRoundOver,
+            isTargetMatched
         };
     }
 
@@ -137,7 +160,13 @@ export class GameLogic {
             isGameOver: false,
             score: 0,
             scoreBreakdown: [],
-            message: 'Match the target colors to score points!'
+            message: 'Round 1 of 3 - Reach 90 points to win!',
+            currentRound: 1,
+            totalScore: 0,
+            maxRounds: 3,
+            targetScore: 90,
+            isRoundOver: false,
+            isTargetMatched: false
         };
     }
 
@@ -153,5 +182,31 @@ export class GameLogic {
      */
     static resetGame(fullDeck: Card[]): GameState {
         return this.createInitialState(fullDeck);
+    }
+    
+    /**
+     * Start the next round with new patterns and cards
+     */
+    static startNextRound(currentState: GameState, fullDeck: Card[]): GameState {
+        const { starting, target } = this.generatePatterns();
+        const { hand, remainingDeck } = this.dealCards(fullDeck, 5);
+        const nextRound = currentState.currentRound + 1;
+        
+        return {
+            tokens: starting,
+            targetColors: target,
+            hand,
+            deck: fullDeck,
+            isGameOver: false,
+            score: 0,
+            scoreBreakdown: [],
+            message: `Round ${nextRound} of ${currentState.maxRounds} - ${currentState.totalScore}/${currentState.targetScore} points`,
+            currentRound: nextRound,
+            totalScore: currentState.totalScore,
+            maxRounds: currentState.maxRounds,
+            targetScore: currentState.targetScore,
+            isRoundOver: false,
+            isTargetMatched: false
+        };
     }
 }

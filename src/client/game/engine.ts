@@ -73,12 +73,27 @@ export class GameEngine {
         
         // Animate the score calculation after rendering
         this.renderer.animateScore(this.gameState.tokens, this.gameState.scoreBreakdown, this.gameState.targetColors);
+        
+        // Check if round is over but game isn't completely over
+        if (this.gameState.isRoundOver && !this.gameState.isGameOver) {
+            // Show "Next Round" button
+            this.renderer.showNextRoundButton(() => this.startNextRound());
+        }
     }
 
     private restart(): void {
         this.gameState = GameLogic.resetGame(createInitialDeck());
         this.selectedCard = null;
         this.renderer.setSelectedCard(null);
+        this.renderer.hideNextRoundButton();
+        this.render();
+    }
+    
+    private startNextRound(): void {
+        this.gameState = GameLogic.startNextRound(this.gameState, createInitialDeck());
+        this.selectedCard = null;
+        this.renderer.setSelectedCard(null);
+        this.renderer.hideNextRoundButton();
         this.render();
     }
 

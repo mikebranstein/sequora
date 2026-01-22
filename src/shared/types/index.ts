@@ -20,6 +20,12 @@ export interface GameState {
     score: number;
     scoreBreakdown: { slot: number; multiplier: number; points: number }[];
     message: string;
+    currentRound: number;
+    totalScore: number;
+    maxRounds: number;
+    targetScore: number;
+    isRoundOver: boolean;
+    isTargetMatched: boolean;
 }
 
 // Card play action

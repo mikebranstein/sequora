@@ -15,6 +15,8 @@ export class GameRenderer {
     private deckModal: HTMLElement;
     private deckCardsContainer: HTMLElement;
     private closeDeckButton: HTMLElement;
+    private roundInfoElement: HTMLElement;
+    private nextRoundButton: HTMLElement;
     private selectedCard: Card | null = null;
     private multipliers: number[];
     private isAnimating: boolean = false;
@@ -36,10 +38,13 @@ export class GameRenderer {
         this.deckModal = this.getOrCreateElement('deck-modal');
         this.deckCardsContainer = this.getOrCreateElement('deck-cards-container');
         this.closeDeckButton = this.getOrCreateElement('close-deck-button', 'button');
+        this.roundInfoElement = this.getOrCreateElement('round-info');
+        this.nextRoundButton = this.getOrCreateElement('next-round-button', 'button');
         this.multipliers = GameLogic.getMultipliers();
         
         this.setupRestartButton();
         this.setupDeckView();
+        this.setupNextRoundButton();
         this.initAudio();
     }
     
@@ -141,6 +146,24 @@ export class GameRenderer {
             this.onRestartClick();
         });
     }
+    
+    private setupNextRoundButton(): void {
+        this.nextRoundButton.textContent = 'Next Round';
+        this.nextRoundButton.classList.add('hidden');
+    }
+    
+    public showNextRoundButton(callback: () => void): void {
+        this.nextRoundButton.classList.remove('hidden');
+        // Remove old listeners by cloning and replacing
+        const newButton = this.nextRoundButton.cloneNode(true) as HTMLElement;
+        this.nextRoundButton.parentNode?.replaceChild(newButton, this.nextRoundButton);
+        this.nextRoundButton = newButton;
+        this.nextRoundButton.addEventListener('click', callback);
+    }
+    
+    public hideNextRoundButton(): void {
+        this.nextRoundButton.classList.add('hidden');
+    }
 
     private setupDeckView(): void {
         this.viewDeckButton.textContent = 'View Deck';
@@ -215,7 +238,15 @@ export class GameRenderer {
         this.renderTargetColors(gameState.targetColors);
         this.renderTokens(gameState.tokens);
         this.renderCards(gameState.hand);
-        this.renderScore(gameState.score);
+        
+        if (gameState.isGameOver) {
+            this.renderFinalScore(gameState.totalScore, gameState.targetScore, gameState.totalScore >= gameState.targetScore);
+        } else {
+            this.scoreElement.classList.remove('final-score', 'target-met', 'target-missed');
+            this.renderScore(gameState.score, gameState.totalScore, gameState.targetScore);
+        }
+        
+        this.renderRoundInfo(gameState.currentRound, gameState.maxRounds, gameState.totalScore, gameState.targetScore);
         this.renderMessage(gameState.message, gameState.isGameOver);
         this.renderDeck(gameState.deck, gameState.hand);
     }
@@ -313,12 +344,36 @@ export class GameRenderer {
         this.messageElement.className = 'message';
 
         if (isGameOver) {
-            this.messageElement.classList.add('game-over');
+            if (message.includes('VICTORY')) {
+                this.messageElement.classList.add('victory');
+            } else {
+                this.messageElement.classList.add('game-over');
+            }
         }
     }
 
-    private renderScore(score: number): void {
-        this.scoreElement.textContent = `Score: ${score}`;
+    private renderScore(score: number, totalScore: number, targetScore: number): void {
+        this.scoreElement.textContent = `Round Score: ${score} | Total: ${totalScore}/${targetScore}`;
+    }
+    
+    private renderFinalScore(totalScore: number, targetScore: number, targetMet: boolean): void {
+        this.scoreElement.classList.add('final-score');
+        if (targetMet) {
+            this.scoreElement.classList.add('target-met');
+            this.scoreElement.textContent = `🏆 Final Score: ${totalScore}/${targetScore} 🏆`;
+        } else {
+            this.scoreElement.classList.add('target-missed');
+            this.scoreElement.textContent = `Final Score: ${totalScore}/${targetScore}`;
+        }
+    }
+    
+    private renderRoundInfo(currentRound: number, maxRounds: number, totalScore: number, targetScore: number): void {
+        this.roundInfoElement.innerHTML = `
+            <div class="round-number">Round ${currentRound} of ${maxRounds}</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${Math.min(100, (totalScore / targetScore) * 100)}%"></div>
+            </div>
+        `;
     }
 
     private async animateScoreCalculation(tokens: TokenColor[], breakdown: { slot: number; multiplier: number; points: number }[], targetColors: TokenColor[]): Promise<void> {
