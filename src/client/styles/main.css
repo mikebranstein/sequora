@@ -12,6 +12,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 20px;
 }
 
 h1 {
@@ -912,4 +913,110 @@ h1 {
 
 @keyframes fillProgress {
     from { width: 0 !important; }
+}
+
+/* History Panel */
+#history-panel {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    max-height: 700px;
+    overflow-y: auto;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.history-header {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.history-empty {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+.history-item {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+}
+
+.history-item:hover {
+    background: rgba(0, 0, 0, 0.4);
+    transform: translateX(5px);
+}
+
+.history-card-name {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #ffd700;
+    font-size: 0.95em;
+    text-align: center;
+}
+
+.history-tokens-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.history-tokens {
+    display: flex;
+    gap: 3px;
+}
+
+.history-token {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.history-red {
+    background-color: #ff4757;
+}
+
+.history-blue {
+    background-color: #5352ed;
+}
+
+.history-arrow {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2em;
+    padding: 0 5px;
+}
+
+/* Custom scrollbar for history panel */
+#history-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+#history-panel::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+#history-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+#history-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }

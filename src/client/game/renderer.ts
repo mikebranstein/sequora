@@ -19,6 +19,7 @@ export class GameRenderer {
     private roundInfoElement: HTMLElement;
     private nextRoundButton: HTMLElement;
     private roundCompleteOverlay: HTMLElement;
+    private historyPanel: HTMLElement;
     private selectedCard: Card | null = null;
     private multipliers: number[];
     private isAnimating: boolean = false;
@@ -44,6 +45,7 @@ export class GameRenderer {
         this.roundInfoElement = this.getOrCreateElement('round-info');
         this.nextRoundButton = this.getOrCreateElement('next-round-button', 'button');
         this.roundCompleteOverlay = this.getOrCreateElement('round-complete-overlay');
+        this.historyPanel = this.getOrCreateElement('history-panel');
         this.multipliers = GameLogic.getMultipliers();
         
         this.setupGameBoard();
@@ -329,6 +331,7 @@ export class GameRenderer {
         this.renderTargetColors(gameState.targetColors);
         this.renderTokens(gameState.tokens);
         this.renderCards(gameState.hand);
+        this.renderHistory(gameState.playHistory);
         
         // Only show score during round end, otherwise show 0 or "-"
         if (gameState.isRoundOver) {
@@ -498,6 +501,60 @@ export class GameRenderer {
                 <div class="progress-fill" style="width: ${Math.min(100, (totalScore / targetScore) * 100)}%"></div>
             </div>
         `;
+    }
+    
+    private renderHistory(playHistory: Array<{ cardName: string; beforeTokens: TokenColor[]; afterTokens: TokenColor[]; targetIndex?: number }>): void {
+        this.historyPanel.innerHTML = '<div class="history-header">Play History</div>';
+        
+        if (playHistory.length === 0) {
+            this.historyPanel.innerHTML += '<div class="history-empty">No cards played yet</div>';
+            return;
+        }
+        
+        // Render in chronological order (most recent last)
+        playHistory.forEach((entry, index) => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            const cardName = document.createElement('div');
+            cardName.className = 'history-card-name';
+            cardName.textContent = `${index + 1}. ${entry.cardName}`;
+            
+            const tokensRow = document.createElement('div');
+            tokensRow.className = 'history-tokens-row';
+            
+            // Before tokens
+            const beforeDiv = document.createElement('div');
+            beforeDiv.className = 'history-tokens';
+            entry.beforeTokens.forEach(token => {
+                const tokenSpan = document.createElement('span');
+                tokenSpan.className = `history-token ${token === 'R' ? 'history-red' : 'history-blue'}`;
+                beforeDiv.appendChild(tokenSpan);
+            });
+            
+            // Arrow
+            const arrow = document.createElement('div');
+            arrow.className = 'history-arrow';
+            arrow.textContent = '→';
+            
+            // After tokens
+            const afterDiv = document.createElement('div');
+            afterDiv.className = 'history-tokens';
+            entry.afterTokens.forEach(token => {
+                const tokenSpan = document.createElement('span');
+                tokenSpan.className = `history-token ${token === 'R' ? 'history-red' : 'history-blue'}`;
+                afterDiv.appendChild(tokenSpan);
+            });
+            
+            tokensRow.appendChild(beforeDiv);
+            tokensRow.appendChild(arrow);
+            tokensRow.appendChild(afterDiv);
+            
+            historyItem.appendChild(cardName);
+            historyItem.appendChild(tokensRow);
+            
+            this.historyPanel.appendChild(historyItem);
+        });
     }
 
     private async animateScoreCalculation(tokens: TokenColor[], breakdown: { slot: number; multiplier: number; points: number }[], targetColors: TokenColor[]): Promise<void> {

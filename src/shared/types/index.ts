@@ -1,6 +1,14 @@
 // Token state: Red or Blue
 export type TokenColor = 'R' | 'B';
 
+// Card play history entry
+export interface CardPlayHistory {
+    cardName: string;
+    beforeTokens: TokenColor[];
+    afterTokens: TokenColor[];
+    targetIndex?: number;
+}
+
 // Card interface - defines a card's properties and behavior
 export interface Card {
     id: string;
@@ -26,6 +34,7 @@ export interface GameState {
     targetScore: number;
     isRoundOver: boolean;
     isTargetMatched: boolean;
+    playHistory: CardPlayHistory[];
 }
 
 // Card play action

@@ -1,4 +1,4 @@
-import { GameState, Card, TokenColor } from '../../shared/types';
+import { GameState, Card, TokenColor, CardPlayHistory } from '../../shared/types';
 
 /**
  * Game Logic - handles game state management and rule enforcement
@@ -82,8 +82,22 @@ export class GameLogic {
             };
         }
 
+        // Capture before state for history
+        const beforeTokens = [...currentState.tokens];
+
         // Execute card effect
         const newTokens = card.execute(currentState.tokens, targetIndex);
+
+        // Create history entry
+        const historyEntry: CardPlayHistory = {
+            cardName: card.name,
+            beforeTokens,
+            afterTokens: [...newTokens],
+            targetIndex
+        };
+
+        // Add to history
+        const newHistory = [...currentState.playHistory, historyEntry];
 
         // Remove card from hand
         const newHand = currentState.hand.filter(c => c.id !== card.id);
@@ -130,7 +144,8 @@ export class GameLogic {
             maxRounds: currentState.maxRounds,
             targetScore: currentState.targetScore,
             isRoundOver,
-            isTargetMatched
+            isTargetMatched,
+            playHistory: newHistory
         };
     }
 
@@ -166,7 +181,8 @@ export class GameLogic {
             maxRounds: 3,
             targetScore: 90,
             isRoundOver: false,
-            isTargetMatched: false
+            isTargetMatched: false,
+            playHistory: []
         };
     }
 
@@ -206,7 +222,8 @@ export class GameLogic {
             maxRounds: currentState.maxRounds,
             targetScore: currentState.targetScore,
             isRoundOver: false,
-            isTargetMatched: false
+            isTargetMatched: false,
+            playHistory: []
         };
     }
 }
