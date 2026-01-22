@@ -20,6 +20,8 @@ export class GameRenderer {
     private nextRoundButton: HTMLElement;
     private roundCompleteOverlay: HTMLElement;
     private historyPanel: HTMLElement;
+    private hamburgerButton: HTMLElement;
+    private menuDropdown: HTMLElement;
     private selectedCard: Card | null = null;
     private multipliers: number[];
     private isAnimating: boolean = false;
@@ -46,10 +48,13 @@ export class GameRenderer {
         this.nextRoundButton = this.getOrCreateElement('next-round-button', 'button');
         this.roundCompleteOverlay = this.getOrCreateElement('round-complete-overlay');
         this.historyPanel = this.getOrCreateElement('history-panel');
+        this.hamburgerButton = this.getOrCreateElement('hamburger-menu', 'button');
+        this.menuDropdown = this.getOrCreateElement('menu-dropdown');
         this.multipliers = GameLogic.getMultipliers();
         
         this.setupGameBoard();
         this.setupRestartButton();
+        this.setupHamburgerMenu();
         this.setupDeckView();
         this.setupNextRoundButton();
         this.setupRoundCompleteOverlay();
@@ -244,7 +249,54 @@ export class GameRenderer {
     public hideRoundCompleteOverlay(): void {
         this.roundCompleteOverlay.classList.add('hidden');
     }
-
+    private setupHamburgerMenu(): void {
+        // Setup hamburger button
+        this.hamburgerButton.innerHTML = '☰';
+        this.hamburgerButton.className = 'hamburger-menu';
+        
+        // Position it next to the title
+        const gameContainer = document.getElementById('game-container');
+        const title = gameContainer?.querySelector('h1');
+        if (title && gameContainer) {
+            const titleWrapper = document.createElement('div');
+            titleWrapper.className = 'title-wrapper';
+            title.parentNode?.insertBefore(titleWrapper, title);
+            titleWrapper.appendChild(title);
+            titleWrapper.appendChild(this.hamburgerButton);
+        }
+        
+        // Setup menu dropdown
+        this.menuDropdown.className = 'menu-dropdown hidden';
+        this.menuDropdown.innerHTML = `
+            <div class="menu-item" data-action="view-deck">View Deck</div>
+        `;
+        
+        // Insert menu dropdown after hamburger
+        this.hamburgerButton.parentNode?.appendChild(this.menuDropdown);
+        
+        // Toggle menu on hamburger click
+        this.hamburgerButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.menuDropdown.classList.toggle('hidden');
+        });
+        
+        // Handle menu item clicks
+        this.menuDropdown.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains('menu-item')) {
+                const action = target.dataset.action;
+                if (action === 'view-deck') {
+                    this.showDeckModal();
+                }
+                this.menuDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', () => {
+            this.menuDropdown.classList.add('hidden');
+        });
+    }
     private setupDeckView(): void {
         this.viewDeckButton.textContent = 'View Deck';
         this.viewDeckButton.addEventListener('click', () => {

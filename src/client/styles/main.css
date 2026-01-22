@@ -18,9 +18,18 @@ body {
 h1 {
     text-align: center;
     color: #ffffff;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     font-size: 2.5em;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    position: relative;
 }
 
 #game-container {
@@ -1019,4 +1028,68 @@ h1 {
 
 #history-panel::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
+}
+
+/* Hamburger Menu */
+.hamburger-menu {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: white;
+    font-size: 1.8em;
+    width: 45px;
+    height: 45px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.hamburger-menu:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.hamburger-menu:active {
+    transform: scale(0.95);
+}
+
+.menu-dropdown {
+    position: absolute;
+    top: 55px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    min-width: 180px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.menu-dropdown.hidden {
+    display: none;
+}
+
+.menu-item {
+    padding: 12px 20px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.menu-item:active {
+    background: rgba(255, 255, 255, 0.25);
 }
