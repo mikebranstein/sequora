@@ -16,9 +16,9 @@ export class GameRenderer {
     private deckModal: HTMLElement;
     private deckCardsContainer: HTMLElement;
     private closeDeckButton: HTMLElement;
-    private roundInfoElement: HTMLElement;
-    private nextRoundButton: HTMLElement;
-    private roundCompleteOverlay: HTMLElement;
+    private trialInfoElement: HTMLElement;
+    private nextTrialButton: HTMLElement;
+    private trialCompleteOverlay: HTMLElement;
     private historyPanel: HTMLElement;
     private hamburgerButton: HTMLElement;
     private menuDropdown: HTMLElement;
@@ -45,9 +45,9 @@ export class GameRenderer {
         this.deckModal = this.getOrCreateElement('deck-modal');
         this.deckCardsContainer = this.getOrCreateElement('deck-cards-container');
         this.closeDeckButton = this.getOrCreateElement('close-deck-button', 'button');
-        this.roundInfoElement = this.getOrCreateElement('round-info');
-        this.nextRoundButton = this.getOrCreateElement('next-round-button', 'button');
-        this.roundCompleteOverlay = this.getOrCreateElement('round-complete-overlay');
+        this.trialInfoElement = this.getOrCreateElement('trial-info');
+        this.nextTrialButton = this.getOrCreateElement('next-trial-button', 'button');
+        this.trialCompleteOverlay = this.getOrCreateElement('trial-complete-overlay');
         this.historyPanel = this.getOrCreateElement('history-panel');
         this.hamburgerButton = this.getOrCreateElement('hamburger-menu', 'button');
         this.menuDropdown = this.getOrCreateElement('menu-dropdown');
@@ -58,8 +58,8 @@ export class GameRenderer {
         this.setupRestartButton();
         this.setupHamburgerMenu();
         this.setupDeckView();
-        this.setupNextRoundButton();
-        this.setupRoundCompleteOverlay();
+        this.setupNextTrialButton();
+        this.setupTrialCompleteOverlay();
         this.setupGameOverOverlay();
         this.initAudio();
     }
@@ -71,11 +71,11 @@ export class GameRenderer {
             gameBoard = document.createElement('div');
             gameBoard.className = 'game-board';
             
-            // Create header for integrated info - single line: round info | round score | total score
+            // Create header for integrated info - single line: trial info | trial score | total score
             const header = document.createElement('div');
             header.className = 'game-board-header';
             
-            header.appendChild(this.roundInfoElement);
+            header.appendChild(this.trialInfoElement);
             header.appendChild(this.scoreElement);
             header.appendChild(this.totalScoreElement);
             
@@ -219,37 +219,37 @@ export class GameRenderer {
         });
     }
     
-    private setupNextRoundButton(): void {
-        this.nextRoundButton.textContent = 'Next Round';
-        this.nextRoundButton.classList.add('hidden');
+    private setupNextTrialButton(): void {
+        this.nextTrialButton.textContent = 'Next Trial';
+        this.nextTrialButton.classList.add('hidden');
     }
     
-    private setupRoundCompleteOverlay(): void {
-        this.roundCompleteOverlay.classList.add('hidden');
+    private setupTrialCompleteOverlay(): void {
+        this.trialCompleteOverlay.classList.add('hidden');
     }
     
-    public showNextRoundButton(callback: () => void): void {
+    public showNextTrialButton(callback: () => void): void {
         // This method is kept for compatibility but now shows the overlay
-        this.showRoundCompleteOverlay(callback);
+        this.showTrialCompleteOverlay(callback);
     }
     
-    public showRoundCompleteOverlay(callback: () => void): void {
+    public showTrialCompleteOverlay(callback: () => void): void {
         // Get current game state info from the DOM
-        const roundScoreText = this.scoreElement.textContent || 'Round: 0';
-        const roundScore = parseInt(roundScoreText.split(':')[1]) || 0;
-        const totalScoreText = this.totalScoreElement.textContent || 'Total: 0/90';
-        const totalParts = totalScoreText.match(/\d+/g) || ['0', '90'];
+        const trialScoreText = this.scoreElement.textContent || 'Trial: 0';
+        const trialScore = parseInt(trialScoreText.split(':')[1]) || 0;
+        const totalScoreText = this.totalScoreElement.textContent || 'Total: 0/180';
+        const totalParts = totalScoreText.match(/\d+/g) || ['0', '180'];
         const totalScore = parseInt(totalParts[0]);
         const targetScore = parseInt(totalParts[1]);
         const progressPercent = Math.min(100, (totalScore / targetScore) * 100);
         
-        this.roundCompleteOverlay.innerHTML = `
-            <div class="round-complete-content">
-                <h2>Round Complete!</h2>
-                <div class="round-stats">
-                    <div class="stat-item round-earned">
+        this.trialCompleteOverlay.innerHTML = `
+            <div class="trial-complete-content">
+                <h2>Trial Complete!</h2>
+                <div class="trial-stats">
+                    <div class="stat-item trial-earned">
                         <div class="stat-label">Points Earned</div>
-                        <div class="stat-value">+${roundScore}</div>
+                        <div class="stat-value">+${trialScore}</div>
                     </div>
                     <div class="stat-item total-progress">
                         <div class="stat-label">Total Progress</div>
@@ -259,29 +259,29 @@ export class GameRenderer {
                         </div>
                     </div>
                 </div>
-                <button class="continue-button">Continue to Next Round</button>
+                <button class="continue-button">Continue to Next Trial</button>
             </div>
         `;
         
-        this.roundCompleteOverlay.classList.remove('hidden');
+        this.trialCompleteOverlay.classList.remove('hidden');
         
         // Add click handler to continue button
-        const continueButton = this.roundCompleteOverlay.querySelector('.continue-button');
+        const continueButton = this.trialCompleteOverlay.querySelector('.continue-button');
         if (continueButton) {
             continueButton.addEventListener('click', () => {
-                this.hideRoundCompleteOverlay();
+                this.hideTrialCompleteOverlay();
                 callback();
             });
         }
     }
     
-    public hideNextRoundButton(): void {
-        this.nextRoundButton.classList.add('hidden');
-        this.hideRoundCompleteOverlay();
+    public hideNextTrialButton(): void {
+        this.nextTrialButton.classList.add('hidden');
+        this.hideTrialCompleteOverlay();
     }
     
-    public hideRoundCompleteOverlay(): void {
-        this.roundCompleteOverlay.classList.add('hidden');
+    public hideTrialCompleteOverlay(): void {
+        this.trialCompleteOverlay.classList.add('hidden');
     }
     
     private setupGameOverOverlay(): void {
@@ -290,9 +290,9 @@ export class GameRenderer {
     
     public showGameOverOverlay(gameState: GameState): void {
         const won = gameState.totalScore >= gameState.targetScore;
-        const totalCards = gameState.roundScores.length * 5; // 5 cards per round
-        const bestRound = gameState.roundScores.length > 0 ? Math.max(...gameState.roundScores) : 0;
-        const perfectRounds = gameState.roundScores.filter(score => score === 31).length; // Max score is 31 (1+2+4+8+16)
+        const totalCards = gameState.trialScores.length * 5; // 5 cards per trial
+        const bestTrial = gameState.trialScores.length > 0 ? Math.max(...gameState.trialScores) : 0;
+        const perfectTrials = gameState.trialScores.filter(score => score === 31).length; // Max score is 31 (1+2+4+8+16)
         
         this.gameOverOverlay.innerHTML = `
             <div class="game-over-content">
@@ -309,15 +309,15 @@ export class GameRenderer {
                 <div class="game-stats">
                     <div class="stats-header">Game Summary</div>
                     
-                    <div class="round-breakdown">
-                        ${gameState.roundScores.map((score, index) => `
-                            <div class="round-stat ${score === bestRound ? 'best-round' : ''}">
-                                <div class="round-stat-label">
-                                    Round ${index + 1}
-                                    ${score === bestRound && gameState.roundScores.length > 1 ? '<span class="badge">Best!</span>' : ''}
+                    <div class="trial-breakdown">
+                        ${gameState.trialScores.map((score, index) => `
+                            <div class="trial-stat ${score === bestTrial ? 'best-trial' : ''}">
+                                <div class="trial-stat-label">
+                                    Wave ${Math.floor(index / gameState.maxTrials) + 1}, Trial ${(index % gameState.maxTrials) + 1}
+                                    ${score === bestTrial && gameState.trialScores.length > 1 ? '<span class="badge">Best!</span>' : ''}
                                     ${score === 31 ? '<span class="badge perfect">Perfect!</span>' : ''}
                                 </div>
-                                <div class="round-stat-value">${score} pts</div>
+                                <div class="trial-stat-value">${score} pts</div>
                             </div>
                         `).join('')}
                     </div>
@@ -328,8 +328,8 @@ export class GameRenderer {
                             <div class="stat-box-label">Cards Played</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-box-value">${perfectRounds}</div>
-                            <div class="stat-box-label">Perfect Rounds</div>
+                            <div class="stat-box-value">${perfectTrials}</div>
+                            <div class="stat-box-label">Perfect Trials</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-box-value">${Math.round((gameState.totalScore / gameState.targetScore) * 100)}%</div>
@@ -510,8 +510,8 @@ export class GameRenderer {
         this.renderCards(gameState.hand);
         this.renderHistory(gameState.playHistory);
         
-        // Only show score during round end, otherwise show 0 or "-"
-        if (gameState.isRoundOver) {
+        // Only show score during trial end, otherwise show 0 or "-"
+        if (gameState.isTrialOver) {
             this.renderScore(gameState.score);
         } else {
             this.renderScore(0);
@@ -520,7 +520,7 @@ export class GameRenderer {
         // Always show total score in separate area
         this.renderTotalScore(gameState.totalScore, gameState.targetScore, false);
         
-        this.renderRoundInfo(gameState.currentRound, gameState.maxRounds, gameState.totalScore, gameState.targetScore);
+        this.renderTrialInfo(gameState.currentTrial, gameState.currentWave, gameState.maxTrials, gameState.totalScore, gameState.targetScore);
         this.renderMessage(gameState.message, gameState.isGameOver);
         this.renderDeck(gameState.deck, gameState.hand);
     }
@@ -705,9 +705,9 @@ export class GameRenderer {
         }
     }
     
-    private renderRoundInfo(currentRound: number, maxRounds: number, totalScore: number, targetScore: number): void {
-        this.roundInfoElement.innerHTML = `
-            <div class="round-number">R${currentRound}/${maxRounds}</div>
+    private renderTrialInfo(currentTrial: number, currentWave: number, maxTrials: number, totalScore: number, targetScore: number): void {
+        this.trialInfoElement.innerHTML = `
+            <div class="trial-number">W${currentWave} T${currentTrial}/${maxTrials}</div>
             <div class="progress-bar">
                 <div class="progress-fill" style="width: ${Math.min(100, (totalScore / targetScore) * 100)}%"></div>
             </div>

@@ -783,12 +783,12 @@ h1 {
         width: 100%;
     }
     
-    #round-info {
+    #trial-info {
         flex: 1 1 100%;
         gap: 8px;
     }
     
-    .round-number {
+    .trial-number {
         font-size: 0.9em;
     }
     
@@ -796,12 +796,12 @@ h1 {
         height: 16px;
     }
     
-    .round-complete-content {
+    .trial-complete-content {
         padding: 30px 25px;
         width: 95%;
     }
     
-    .round-complete-content h2 {
+    .trial-complete-content h2 {
         font-size: 2em;
         margin-bottom: 20px;
     }
@@ -810,7 +810,7 @@ h1 {
         font-size: 2em;
     }
     
-    .round-earned .stat-value {
+    .trial-earned .stat-value {
         font-size: 2.5em;
     }
     
@@ -820,8 +820,8 @@ h1 {
     }
 }
 
-/* Round Info */
-#round-info {
+/* Trial Info */
+#trial-info {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -829,7 +829,7 @@ h1 {
     min-width: 0;
 }
 
-.round-number {
+.trial-number {
     font-size: 1em;
     font-weight: bold;
     color: #ffd700;
@@ -854,8 +854,8 @@ h1 {
     box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.3);
 }
 
-/* Next Round Button */
-#next-round-button {
+/* Next Trial Button */
+#next-trial-button {
     display: block;
     margin: 20px auto;
     background: linear-gradient(135deg, #4caf50, #8bc34a);
@@ -870,22 +870,22 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-#next-round-button:hover {
+#next-trial-button:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
     background: linear-gradient(135deg, #8bc34a, #4caf50);
 }
 
-#next-round-button:active {
+#next-trial-button:active {
     transform: scale(0.98);
 }
 
-#next-round-button.hidden {
+#next-trial-button.hidden {
     display: none;
 }
 
-/* Round Complete Overlay */
-#round-complete-overlay {
+/* Trial Complete Overlay */
+#trial-complete-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -900,11 +900,11 @@ h1 {
     animation: fadeIn 0.3s ease;
 }
 
-#round-complete-overlay.hidden {
+#trial-complete-overlay.hidden {
     display: none;
 }
 
-.round-complete-content {
+.trial-complete-content {
     background: linear-gradient(135deg, rgba(103, 126, 234, 0.95), rgba(118, 75, 162, 0.95));
     padding: 40px 50px;
     border-radius: 20px;
@@ -916,14 +916,14 @@ h1 {
     animation: slideIn 0.4s ease;
 }
 
-.round-complete-content h2 {
+.trial-complete-content h2 {
     margin: 0 0 30px 0;
     font-size: 2.5em;
     color: #ffffff;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
 }
 
-.round-stats {
+.trial-stats {
     display: flex;
     flex-direction: column;
     gap: 25px;
@@ -951,7 +951,7 @@ h1 {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
 }
 
-.round-earned .stat-value {
+.trial-earned .stat-value {
     color: #4caf50;
     font-size: 3em;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
@@ -1333,14 +1333,14 @@ h1 {
     color: #fff;
 }
 
-.round-breakdown {
+.trial-breakdown {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-bottom: 25px;
 }
 
-.round-stat {
+.trial-stat {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1351,17 +1351,17 @@ h1 {
     transition: all 0.3s ease;
 }
 
-.round-stat:hover {
+.trial-stat:hover {
     background: rgba(0, 0, 0, 0.35);
     transform: translateX(5px);
 }
 
-.round-stat.best-round {
+.trial-stat.best-trial {
     border: 2px solid #ffd700;
     background: rgba(255, 215, 0, 0.15);
 }
 
-.round-stat-label {
+.trial-stat-label {
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -1382,7 +1382,7 @@ h1 {
     color: #fff;
 }
 
-.round-stat-value {
+.trial-stat-value {
     font-size: 1.3em;
     font-weight: bold;
     color: #4ecca3;

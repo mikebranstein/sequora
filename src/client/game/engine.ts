@@ -71,8 +71,8 @@ export class GameEngine {
         this.gameState = GameLogic.playCard(this.gameState, card, targetIndex);
         this.render();
         
-        // Only animate score and show overlay when round is over
-        if (this.gameState.isRoundOver) {
+        // Only animate score and show overlay when trial is over
+        if (this.gameState.isTrialOver) {
             // Animate the score calculation after rendering and wait for it to complete
             await this.renderer.animateScore(this.gameState);
             
@@ -80,7 +80,7 @@ export class GameEngine {
             if (this.gameState.isGameOver) {
                 this.renderer.showGameOverOverlay(this.gameState);
             } else {
-                this.renderer.showNextRoundButton(() => this.startNextRound());
+                this.renderer.showNextTrialButton(() => this.startNextTrial());
             }
         }
     }
@@ -89,16 +89,16 @@ export class GameEngine {
         this.gameState = GameLogic.resetGame(createInitialDeck());
         this.selectedCard = null;
         this.renderer.setSelectedCard(null);
-        this.renderer.hideNextRoundButton();
+        this.renderer.hideNextTrialButton();
         this.renderer.hideGameOverOverlay();
         this.render();
     }
     
-    private startNextRound(): void {
-        this.gameState = GameLogic.startNextRound(this.gameState, createInitialDeck());
+    private startNextTrial(): void {
+        this.gameState = GameLogic.startNextTrial(this.gameState, createInitialDeck());
         this.selectedCard = null;
         this.renderer.setSelectedCard(null);
-        this.renderer.hideNextRoundButton();
+        this.renderer.hideNextTrialButton();
         this.render();
     }
 

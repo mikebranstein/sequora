@@ -175,22 +175,22 @@ export class GameLogic {
         const movesPlayed = newHistory.length;
         const { score, breakdown, bonusEarned } = this.calculateScore(newTokens, currentState.targetColors, movesPlayed, currentState.minMovesTarget);
         const isTargetMatched = this.arePatternsEqual(newTokens, currentState.targetColors);
-        const isRoundOver = newHand.length === 0 || isTargetMatched;
+        const isTrialOver = newHand.length === 0 || isTargetMatched;
         
         // Calculate new total score
-        const newTotalScore = isRoundOver ? currentState.totalScore + score : currentState.totalScore;
+        const newTotalScore = isTrialOver ? currentState.totalScore + score : currentState.totalScore;
         
-        // Update round scores array when round ends
-        const newRoundScores = isRoundOver ? [...currentState.roundScores, score] : currentState.roundScores;
+        // Update trial scores array when trial ends
+        const newTrialScores = isTrialOver ? [...currentState.trialScores, score] : currentState.trialScores;
         
-        // Check if game is completely over
-        const isGameOver = isRoundOver && (currentState.currentRound >= currentState.maxRounds || newTotalScore >= currentState.targetScore);
+        // Check if game is completely over (all waves completed or target score reached)
+        const isGameOver = isTrialOver && ((currentState.currentTrial >= currentState.maxTrials && currentState.currentWave >= currentState.maxWaves) || newTotalScore >= currentState.targetScore);
 
         let message = '';
         if (isTargetMatched) {
             message = `Perfect! Target matched!`;
-        } else if (isRoundOver) {
-            message = `Round ${currentState.currentRound} complete!`;
+        } else if (isTrialOver) {
+            message = `Trial ${currentState.currentTrial} complete!`;
         } else {
             message = `Played ${card.name}`;
         }
@@ -212,15 +212,17 @@ export class GameLogic {
             score,
             scoreBreakdown: breakdown,
             message,
-            currentRound: currentState.currentRound,
+            currentTrial: currentState.currentTrial,
+            currentWave: currentState.currentWave,
             totalScore: newTotalScore,
-            maxRounds: currentState.maxRounds,
+            maxTrials: currentState.maxTrials,
+            maxWaves: currentState.maxWaves,
             targetScore: currentState.targetScore,
-            isRoundOver,
+            isTrialOver,
             isTargetMatched,
             playHistory: newHistory,
-            roundScores: newRoundScores,
-            bonusEarned: isRoundOver ? bonusEarned : false,
+            trialScores: newTrialScores,
+            bonusEarned: isTrialOver ? bonusEarned : false,
             minMovesTarget: currentState.minMovesTarget
         };
     }
@@ -254,15 +256,17 @@ export class GameLogic {
             isGameOver: false,
             score: 0,
             scoreBreakdown: [],
-            message: 'Round 1 of 3 - Reach 90 points to win!',
-            currentRound: 1,
+            message: 'Wave 1, Trial 1 of 3 - Reach 180 points to win!',
+            currentTrial: 1,
+            currentWave: 1,
             totalScore: 0,
-            maxRounds: 3,
-            targetScore: 90,
-            isRoundOver: false,
+            maxTrials: 3,
+            maxWaves: 2,
+            targetScore: 180,
+            isTrialOver: false,
             isTargetMatched: false,
             playHistory: [],
-            roundScores: [],
+            trialScores: [],
             bonusEarned: false,
             minMovesTarget: minMoves
         };
@@ -283,14 +287,23 @@ export class GameLogic {
     }
     
     /**
-     * Start the next round with new patterns and cards
+     * Start the next trial with new patterns and cards
      */
-    static startNextRound(currentState: GameState, fullDeck: Card[]): GameState {
+    static startNextTrial(currentState: GameState, fullDeck: Card[]): GameState {
         const { starting, target } = this.generatePatterns();
         const { hand, remainingDeck } = this.dealCards(fullDeck, 5);
-        const nextRound = currentState.currentRound + 1;
         
-        // Calculate minimum moves for new round
+        // Determine next trial and wave
+        let nextTrial = currentState.currentTrial + 1;
+        let nextWave = currentState.currentWave;
+        
+        // Move to next wave if we've completed all trials in current wave
+        if (nextTrial > currentState.maxTrials) {
+            nextTrial = 1;
+            nextWave++;
+        }
+        
+        // Calculate minimum moves for new trial
         const minMoves = this.calculateMinimumMoves(starting, target, fullDeck);
         
         return {
@@ -301,15 +314,17 @@ export class GameLogic {
             isGameOver: false,
             score: 0,
             scoreBreakdown: [],
-            message: `Round ${nextRound} of ${currentState.maxRounds} - ${currentState.totalScore}/${currentState.targetScore} points`,
-            currentRound: nextRound,
+            message: `Wave ${nextWave}, Trial ${nextTrial} of ${currentState.maxTrials} - ${currentState.totalScore}/${currentState.targetScore} points`,
+            currentTrial: nextTrial,
+            currentWave: nextWave,
             totalScore: currentState.totalScore,
-            maxRounds: currentState.maxRounds,
+            maxTrials: currentState.maxTrials,
+            maxWaves: currentState.maxWaves,
             targetScore: currentState.targetScore,
-            isRoundOver: false,
+            isTrialOver: false,
             isTargetMatched: false,
             playHistory: [],
-            roundScores: currentState.roundScores,
+            trialScores: currentState.trialScores,
             bonusEarned: false,
             minMovesTarget: minMoves
         };

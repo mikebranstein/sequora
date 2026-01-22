@@ -28,14 +28,16 @@ export interface GameState {
     score: number;
     scoreBreakdown: { slot: number; multiplier: number; points: number }[];
     message: string;
-    currentRound: number;
+    currentTrial: number;
+    currentWave: number;
     totalScore: number;
-    maxRounds: number;
+    maxTrials: number;
+    maxWaves: number;
     targetScore: number;
-    isRoundOver: boolean;
+    isTrialOver: boolean;
     isTargetMatched: boolean;
     playHistory: CardPlayHistory[];
-    roundScores: number[];
+    trialScores: number[];
     bonusEarned: boolean;
     minMovesTarget: number;
 }
