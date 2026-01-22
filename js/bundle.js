@@ -611,11 +611,10 @@ class GameRenderer {
         if (!gameBoard) {
             gameBoard = document.createElement('div');
             gameBoard.className = 'game-board';
-            // Create header for integrated info - single line: trial info | trial score | total score
+            // Create header for integrated info - wave/trial indicators and wave score
             const header = document.createElement('div');
             header.className = 'game-board-header';
             header.appendChild(this.trialInfoElement);
-            header.appendChild(this.scoreElement);
             header.appendChild(this.totalScoreElement);
             gameBoard.appendChild(header);
             // Insert before target container
@@ -624,6 +623,8 @@ class GameRenderer {
                 container.insertBefore(gameBoard, this.targetContainer);
             }
         }
+        // Initially hide the score element
+        this.scoreElement.style.display = 'none';
     }
     initAudio() {
         // Initialize AudioContext on first user interaction to comply with browser policies
@@ -753,7 +754,7 @@ class GameRenderer {
                 <h2>Trial Complete!</h2>
                 <div class="trial-stats">
                     <div class="stat-item trial-earned">
-                        <div class="stat-label">Points Earned</div>
+                        <div class="stat-label">Score Earned</div>
                         <div class="stat-value">+${trialScore}</div>
                     </div>
                     <div class="stat-item total-progress">
@@ -923,6 +924,7 @@ class GameRenderer {
         this.menuDropdown.innerHTML = `
             <div class="menu-item" data-action="view-deck">View Deck</div>
             <div class="menu-item" data-action="toggle-logo">Switch Logo Theme</div>
+            <div class="menu-item" data-action="quit">Quit</div>
         `;
         // Insert menu dropdown after hamburger
         (_a = this.hamburgerButton.parentNode) === null || _a === void 0 ? void 0 : _a.appendChild(this.menuDropdown);
@@ -943,6 +945,19 @@ class GameRenderer {
                 }
                 else if (action === 'toggle-logo') {
                     this.toggleLogoTheme();
+                }
+                else if (action === 'quit') {
+                    // Return to start screen
+                    const gameContainer = document.getElementById('game-container');
+                    const startScreen = document.getElementById('start-screen');
+                    if (gameContainer && startScreen) {
+                        gameContainer.classList.add('hidden');
+                        startScreen.classList.remove('hidden');
+                        // Reload the page to reset game state
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 100);
+                    }
                 }
                 this.menuDropdown.classList.add('hidden');
             }
@@ -1065,8 +1080,8 @@ class GameRenderer {
         else {
             this.renderScore(0);
         }
-        // Always show total score in separate area
-        this.renderTotalScore(gameState.totalScore, gameState.targetScore, false);
+        // Always show wave score in score display area
+        this.renderTotalScore(gameState.waveScore, gameState.waveTargetScore, false);
         this.renderTrialInfo(gameState.currentTrial, gameState.currentWave, gameState.maxTrials, gameState.waveScore, gameState.waveTargetScore);
         this.renderMessage(gameState.message, gameState.isGameOver);
         this.renderDeck(gameState.deck, gameState.hand);
@@ -1076,7 +1091,18 @@ class GameRenderer {
             if (this.isAnimating)
                 return;
             this.isAnimating = true;
+            // Show trial score element and add it to header during animation
+            const header = document.querySelector('.game-board-header');
+            if (header && !header.contains(this.scoreElement)) {
+                // Insert trial score between trial info and wave score
+                header.insertBefore(this.scoreElement, this.totalScoreElement);
+            }
+            this.scoreElement.style.display = 'block';
+            this.scoreElement.textContent = 'Score: 0';
             yield this.animateScoreCalculation(gameState.tokens, gameState.scoreBreakdown, gameState.targetColors, gameState.bonusEarned);
+            // Hide trial score after animation
+            yield this.delay(500);
+            this.scoreElement.style.display = 'none';
             // After animation completes, if game is over, show final score
             if (gameState.isGameOver) {
                 this.renderTotalScore(gameState.totalScore, gameState.targetScore, true);
@@ -1134,7 +1160,7 @@ class GameRenderer {
         const movesToken = document.createElement('div');
         movesToken.className = 'token token-moves';
         movesToken.innerHTML = `<div class="moves-icon">🎴</div><div class="moves-count">${currentMoves !== undefined ? currentMoves : 0}</div>`;
-        movesToken.title = `Cards played this round: ${currentMoves !== undefined ? currentMoves : 0}`;
+        movesToken.title = `Cards played this trial: ${currentMoves !== undefined ? currentMoves : 0}`;
         movesWrapper.appendChild(movesToken);
         this.tokensContainer.appendChild(movesWrapper);
     }
@@ -1197,7 +1223,7 @@ class GameRenderer {
         }
     }
     renderScore(score) {
-        this.scoreElement.textContent = `Round: ${score}`;
+        this.scoreElement.textContent = `Score: ${score}`;
     }
     renderTotalScore(totalScore, targetScore, isGameOver) {
         this.totalScoreElement.classList.remove('final-score', 'target-met', 'target-missed');
@@ -1214,7 +1240,7 @@ class GameRenderer {
             }
         }
         else {
-            this.totalScoreElement.textContent = `Total: ${totalScore}/${targetScore}`;
+            this.totalScoreElement.textContent = `Score: ${totalScore}/${targetScore}`;
         }
     }
     renderFinalScore(totalScore, targetScore, targetMet) {
@@ -1230,10 +1256,8 @@ class GameRenderer {
     }
     renderTrialInfo(currentTrial, currentWave, maxTrials, waveScore, waveTargetScore) {
         this.trialInfoElement.innerHTML = `
-            <div class="trial-number">W${currentWave} T${currentTrial}/${maxTrials}</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${Math.min(100, (waveScore / waveTargetScore) * 100)}%"></div>
-            </div>
+            <div class="wave-indicator">Wave ${currentWave}</div>
+            <div class="trial-indicator">Trial ${currentTrial}/${maxTrials}</div>
         `;
     }
     renderHistory(playHistory) {
@@ -1355,7 +1379,7 @@ class GameRenderer {
                 this.messageElement.textContent = bonusEarned ? '🎉 PERFECT! Bonus earned! 🎉' : '🎉 PERFECT! Target matched! 🎉';
             }
             else {
-                this.messageElement.textContent = `Round Score: ${runningTotal}`;
+                this.messageElement.textContent = `Trial Score: ${runningTotal}`;
             }
         });
     }

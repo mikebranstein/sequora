@@ -4,7 +4,7 @@
 
 body {
     margin: 0;
-    padding: 20px;
+    padding: 10px;
     font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -27,12 +27,14 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 25px;
-    padding: 20px;
+    margin-bottom: 12px;
+    padding: 12px;
     background: #000000;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     position: relative;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
 }
 
 .game-header.white-theme {
@@ -51,7 +53,7 @@ h1 {
 }
 
 .game-logo {
-    max-width: 280px;
+    max-width: 200px;
     height: auto;
     display: block;
 }
@@ -67,12 +69,33 @@ h1 {
 
 #game-container {
     background-color: rgba(255, 255, 255, 0.1);
-    padding: 40px;
+    padding: 20px;
     border-radius: 20px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     max-width: 1100px;
     width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+#game-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 40px,
+        rgba(255, 255, 255, 0.02) 40px,
+        rgba(255, 255, 255, 0.02) 80px
+    );
+    pointer-events: none;
+    opacity: 0.5;
 }
 
 #game-container.hidden {
@@ -101,16 +124,7 @@ h1 {
 
 /* Message Display */
 .message {
-    text-align: center;
-    font-size: 1.5em;
-    margin-bottom: 30px;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.2);
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none;
 }
 
 .message.victory {
@@ -237,13 +251,28 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
-    margin-bottom: 10px;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
+    gap: 15px;
+    margin-bottom: 8px;
+    padding: 12px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.25));
+    border-radius: 20px;
     border: 2px solid rgba(255, 255, 255, 0.2);
     position: relative;
+}
+
+.target-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent
+    );
+    border-radius: 20px 20px 0 0;
 }
 
 .target-label {
@@ -265,8 +294,8 @@ h1 {
 }
 
 .target-token {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -348,11 +377,29 @@ h1 {
 .tokens-container {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin-bottom: 40px;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 15px;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.15));
+    border-radius: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.tokens-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent
+    );
+    border-radius: 0 0 20px 20px;
 }
 
 .token-wrapper {
@@ -408,8 +455,8 @@ h1 {
 }
 
 .token {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -499,18 +546,18 @@ h1 {
 .cards-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
-    margin-bottom: 30px;
-    min-height: 150px;
+    margin-bottom: 15px;
+    min-height: 120px;
 }
 
 .card {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
-    padding: 20px;
-    width: 180px;
+    padding: 15px;
+    width: 150px;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
@@ -863,32 +910,28 @@ h1 {
     align-items: center;
     gap: 12px;
     flex: 1;
-    min-width: 0;
 }
 
-.trial-number {
-    font-size: 1em;
-    font-weight: bold;
-    color: #ffd700;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+.wave-indicator {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #4ecca3;
+    padding: 4px 12px;
+    background: rgba(78, 204, 163, 0.15);
+    border-radius: 6px;
+    border: 1px solid rgba(78, 204, 163, 0.3);
     white-space: nowrap;
 }
 
-.progress-bar {
-    flex: 1;
-    height: 18px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 9px;
-    overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    min-width: 80px;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4caf50, #8bc34a);
-    transition: width 0.5s ease;
-    box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.3);
+.trial-indicator {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #9b87f5;
+    padding: 4px 12px;
+    background: rgba(155, 135, 245, 0.15);
+    border-radius: 6px;
+    border: 1px solid rgba(155, 135, 245, 0.3);
+    white-space: nowrap;
 }
 
 /* Next Trial Button */
