@@ -506,7 +506,7 @@ export class GameRenderer {
 
     public render(gameState: GameState): void {
         this.renderTargetColors(gameState.targetColors, gameState.minMovesTarget);
-        this.renderTokens(gameState.tokens);
+        this.renderTokens(gameState.tokens, gameState.playHistory.length);
         this.renderCards(gameState.hand);
         this.renderHistory(gameState.playHistory);
         
@@ -538,7 +538,7 @@ export class GameRenderer {
         this.isAnimating = false;
     }
 
-    private renderTokens(tokens: TokenColor[]): void {
+    private renderTokens(tokens: TokenColor[], currentMoves?: number): void {
         // Ensure tokens container is in game board
         const gameBoard = document.querySelector('.game-board');
         if (gameBoard && this.tokensContainer.parentNode !== gameBoard) {
@@ -587,6 +587,23 @@ export class GameRenderer {
         
         bonusWrapper.appendChild(bonusToken);
         this.tokensContainer.appendChild(bonusWrapper);
+        
+        // Add separator
+        const separator2 = document.createElement('div');
+        separator2.className = 'token-separator';
+        this.tokensContainer.appendChild(separator2);
+        
+        // Add current moves counter (card icon)
+        const movesWrapper = document.createElement('div');
+        movesWrapper.className = 'token-wrapper';
+        
+        const movesToken = document.createElement('div');
+        movesToken.className = 'token token-moves';
+        movesToken.innerHTML = `<div class="moves-icon">🎴</div><div class="moves-count">${currentMoves !== undefined ? currentMoves : 0}</div>`;
+        movesToken.title = `Cards played this round: ${currentMoves !== undefined ? currentMoves : 0}`;
+        
+        movesWrapper.appendChild(movesToken);
+        this.tokensContainer.appendChild(movesWrapper);
     }
 
     private renderCards(hand: Card[]): void {
