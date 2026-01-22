@@ -122,6 +122,24 @@ h1 {
     border-radius: 10px;
 }
 
+.game-board-header.white-theme {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+}
+
+.game-board-header.white-theme .wave-indicator,
+.game-board-header.white-theme .trial-indicator {
+    color: #333;
+    border-color: rgba(0, 0, 0, 0.3);
+}
+
+.game-board-header.white-theme #total-score-display,
+.game-board-header.white-theme #score-display {
+    color: #333;
+    border-color: rgba(0, 0, 0, 0.3);
+    text-shadow: none;
+}
+
 /* Message Display */
 .message {
     display: none;
