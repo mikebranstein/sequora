@@ -5,7 +5,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,10 +20,10 @@
     text-align: center;
     max-width: 600px;
     padding: 40px;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 30px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
     animation: startFadeIn 1s ease-out;
 }
 
@@ -110,26 +110,6 @@
 .start-button:active {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(78, 204, 163, 0.5);
-}
-
-.start-features {
-    margin-top: 40px;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-.feature-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1em;
-}
-
-.feature-icon {
-    font-size: 1.5em;
 }
 
 @keyframes startFadeIn {
