@@ -330,8 +330,12 @@ export class GameRenderer {
         this.renderTokens(gameState.tokens);
         this.renderCards(gameState.hand);
         
-        // Always show round score
-        this.renderScore(gameState.score);
+        // Only show score during round end, otherwise show 0 or "-"
+        if (gameState.isRoundOver) {
+            this.renderScore(gameState.score);
+        } else {
+            this.renderScore(0);
+        }
         
         // Always show total score in separate area
         this.renderTotalScore(gameState.totalScore, gameState.targetScore, false);
