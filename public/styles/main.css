@@ -27,13 +27,17 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #000000;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 .game-logo {
-    max-width: 300px;
+    max-width: 280px;
     height: auto;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+    display: block;
 }
 
 .title-wrapper {
