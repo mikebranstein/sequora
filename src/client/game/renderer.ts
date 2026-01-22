@@ -430,15 +430,10 @@ export class GameRenderer {
         this.hamburgerButton.innerHTML = '☰';
         this.hamburgerButton.className = 'hamburger-menu';
         
-        // Position it next to the title
-        const gameContainer = document.getElementById('game-container');
-        const title = gameContainer?.querySelector('h1');
-        if (title && gameContainer) {
-            const titleWrapper = document.createElement('div');
-            titleWrapper.className = 'title-wrapper';
-            title.parentNode?.insertBefore(titleWrapper, title);
-            titleWrapper.appendChild(title);
-            titleWrapper.appendChild(this.hamburgerButton);
+        // Position it inside the game header to the left of the logo
+        const gameHeader = document.querySelector('.game-header');
+        if (gameHeader) {
+            gameHeader.insertBefore(this.hamburgerButton, gameHeader.firstChild);
         }
         
         // Setup menu dropdown
