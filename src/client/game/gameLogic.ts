@@ -255,8 +255,8 @@ export class GameLogic {
         const { starting, target } = this.generatePatterns();
         const { hand, remainingDeck } = this.dealCards(fullDeck, 5);
         
-        // Calculate minimum moves needed with full deck
-        const minMoves = this.calculateMinimumMoves(starting, target, fullDeck);
+        // Calculate minimum moves needed with the cards in hand
+        const minMoves = this.calculateMinimumMoves(starting, target, hand);
         
         return {
             tokens: starting,
@@ -320,8 +320,8 @@ export class GameLogic {
             newTrialScores = []; // Reset trial scores for new wave
         }
         
-        // Calculate minimum moves for new trial
-        const minMoves = this.calculateMinimumMoves(starting, target, fullDeck);
+        // Calculate minimum moves for new trial with the cards in hand
+        const minMoves = this.calculateMinimumMoves(starting, target, hand);
         
         return {
             tokens: starting,
