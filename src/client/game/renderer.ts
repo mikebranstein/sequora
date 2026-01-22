@@ -814,10 +814,8 @@ export class GameRenderer {
     
     private renderTrialInfo(currentTrial: number, currentWave: number, maxTrials: number, waveScore: number, waveTargetScore: number): void {
         this.trialInfoElement.innerHTML = `
-            <div class="trial-number">W${currentWave} T${currentTrial}/${maxTrials}</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${Math.min(100, (waveScore / waveTargetScore) * 100)}%"></div>
-            </div>
+            <div class="wave-indicator">Wave ${currentWave}</div>
+            <div class="trial-indicator">Trial ${currentTrial}/${maxTrials}</div>
         `;
     }
     
