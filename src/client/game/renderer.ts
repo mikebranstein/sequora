@@ -694,7 +694,7 @@ export class GameRenderer {
         const movesToken = document.createElement('div');
         movesToken.className = 'token token-moves';
         movesToken.innerHTML = `<div class="moves-icon">🎴</div><div class="moves-count">${currentMoves !== undefined ? currentMoves : 0}</div>`;
-        movesToken.title = `Cards played this round: ${currentMoves !== undefined ? currentMoves : 0}`;
+        movesToken.title = `Cards played this trial: ${currentMoves !== undefined ? currentMoves : 0}`;
         
         movesWrapper.appendChild(movesToken);
         this.tokensContainer.appendChild(movesWrapper);
@@ -767,7 +767,7 @@ export class GameRenderer {
     }
 
     private renderScore(score: number): void {
-        this.scoreElement.textContent = `Round: ${score}`;
+        this.scoreElement.textContent = `Trial: ${score}`;
     }
     
     private renderTotalScore(totalScore: number, targetScore: number, isGameOver: boolean): void {
@@ -784,7 +784,7 @@ export class GameRenderer {
                 this.totalScoreElement.textContent = `Final: ${totalScore}/${targetScore}`;
             }
         } else {
-            this.totalScoreElement.textContent = `Wave: ${totalScore}/${targetScore}`;
+            this.totalScoreElement.textContent = `Score: ${totalScore}/${targetScore}`;
         }
     }
     
@@ -955,7 +955,7 @@ export class GameRenderer {
             this.playPerfectSound();
             this.messageElement.textContent = bonusEarned ? '🎉 PERFECT! Bonus earned! 🎉' : '🎉 PERFECT! Target matched! 🎉';
         } else {
-            this.messageElement.textContent = `Round Score: ${runningTotal}`;
+            this.messageElement.textContent = `Trial Score: ${runningTotal}`;
         }
     }
     
