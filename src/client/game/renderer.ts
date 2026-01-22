@@ -611,8 +611,8 @@ export class GameRenderer {
             this.renderScore(0);
         }
         
-        // Always show total score in separate area
-        this.renderTotalScore(gameState.totalScore, gameState.targetScore, false);
+        // Always show wave score in score display area
+        this.renderTotalScore(gameState.waveScore, gameState.waveTargetScore, false);
         
         this.renderTrialInfo(gameState.currentTrial, gameState.currentWave, gameState.maxTrials, gameState.waveScore, gameState.waveTargetScore);
         this.renderMessage(gameState.message, gameState.isGameOver);
@@ -784,7 +784,7 @@ export class GameRenderer {
                 this.totalScoreElement.textContent = `Final: ${totalScore}/${targetScore}`;
             }
         } else {
-            this.totalScoreElement.textContent = `Total: ${totalScore}/${targetScore}`;
+            this.totalScoreElement.textContent = `Wave: ${totalScore}/${targetScore}`;
         }
     }
     
