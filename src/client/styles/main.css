@@ -32,7 +32,6 @@ h1 {
     background: #000000;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .game-header.white-theme {
@@ -44,7 +43,6 @@ h1 {
     max-width: 280px;
     height: auto;
     display: block;
-    transition: opacity 0.3s ease;
 }
 
 .title-wrapper {
