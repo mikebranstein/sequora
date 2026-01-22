@@ -1,7 +1,7 @@
 {
-  "name": "web-game",
+  "name": "sequora",
   "version": "1.0.0",
-  "description": "A web-based game project using TypeScript and Node.js",
+  "description": "Sequora - A strategic pattern-matching card game",
   "main": "src/server/app.ts",
   "scripts": {
     "start": "node dist/server/app.js",
