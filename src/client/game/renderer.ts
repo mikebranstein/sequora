@@ -10,6 +10,7 @@ export class GameRenderer {
     private cardsContainer: HTMLElement;
     private messageElement: HTMLElement;
     private scoreElement: HTMLElement;
+    private totalScoreElement: HTMLElement;
     private restartButton: HTMLElement;
     private viewDeckButton: HTMLElement;
     private deckModal: HTMLElement;
@@ -33,6 +34,7 @@ export class GameRenderer {
         this.cardsContainer = this.getOrCreateElement('cards-container');
         this.messageElement = this.getOrCreateElement('message');
         this.scoreElement = this.getOrCreateElement('score-display');
+        this.totalScoreElement = this.getOrCreateElement('total-score-display');
         this.restartButton = this.getOrCreateElement('restart-button', 'button');
         this.viewDeckButton = this.getOrCreateElement('view-deck-button', 'button');
         this.deckModal = this.getOrCreateElement('deck-modal');
@@ -239,22 +241,27 @@ export class GameRenderer {
         this.renderTokens(gameState.tokens);
         this.renderCards(gameState.hand);
         
-        if (gameState.isGameOver) {
-            this.renderFinalScore(gameState.totalScore, gameState.targetScore, gameState.totalScore >= gameState.targetScore);
-        } else {
-            this.scoreElement.classList.remove('final-score', 'target-met', 'target-missed');
-            this.renderScore(gameState.score, gameState.totalScore, gameState.targetScore);
-        }
+        // Always show round score
+        this.renderScore(gameState.score);
+        
+        // Always show total score in separate area
+        this.renderTotalScore(gameState.totalScore, gameState.targetScore, false);
         
         this.renderRoundInfo(gameState.currentRound, gameState.maxRounds, gameState.totalScore, gameState.targetScore);
         this.renderMessage(gameState.message, gameState.isGameOver);
         this.renderDeck(gameState.deck, gameState.hand);
     }
     
-    public async animateScore(tokens: TokenColor[], scoreBreakdown: { slot: number; multiplier: number; points: number }[], targetColors: TokenColor[]): Promise<void> {
+    public async animateScore(gameState: GameState): Promise<void> {
         if (this.isAnimating) return;
         this.isAnimating = true;
-        await this.animateScoreCalculation(tokens, scoreBreakdown, targetColors);
+        await this.animateScoreCalculation(gameState.tokens, gameState.scoreBreakdown, gameState.targetColors);
+        
+        // After animation completes, if game is over, show final score
+        if (gameState.isGameOver) {
+            this.renderTotalScore(gameState.totalScore, gameState.targetScore, true);
+        }
+        
         this.isAnimating = false;
     }
 
@@ -352,18 +359,36 @@ export class GameRenderer {
         }
     }
 
-    private renderScore(score: number, totalScore: number, targetScore: number): void {
-        this.scoreElement.textContent = `Round Score: ${score} | Total: ${totalScore}/${targetScore}`;
+    private renderScore(score: number): void {
+        this.scoreElement.textContent = `Round Score: ${score}`;
+    }
+    
+    private renderTotalScore(totalScore: number, targetScore: number, isGameOver: boolean): void {
+        this.totalScoreElement.classList.remove('final-score', 'target-met', 'target-missed');
+        
+        if (isGameOver) {
+            this.totalScoreElement.classList.add('final-score');
+            const targetMet = totalScore >= targetScore;
+            if (targetMet) {
+                this.totalScoreElement.classList.add('target-met');
+                this.totalScoreElement.textContent = `🏆 Final Score: ${totalScore}/${targetScore} 🏆`;
+            } else {
+                this.totalScoreElement.classList.add('target-missed');
+                this.totalScoreElement.textContent = `Final Score: ${totalScore}/${targetScore}`;
+            }
+        } else {
+            this.totalScoreElement.textContent = `Total Score: ${totalScore} / ${targetScore}`;
+        }
     }
     
     private renderFinalScore(totalScore: number, targetScore: number, targetMet: boolean): void {
-        this.scoreElement.classList.add('final-score');
+        this.totalScoreElement.classList.add('final-score');
         if (targetMet) {
-            this.scoreElement.classList.add('target-met');
-            this.scoreElement.textContent = `🏆 Final Score: ${totalScore}/${targetScore} 🏆`;
+            this.totalScoreElement.classList.add('target-met');
+            this.totalScoreElement.textContent = `🏆 Final Score: ${totalScore}/${targetScore} 🏆`;
         } else {
-            this.scoreElement.classList.add('target-missed');
-            this.scoreElement.textContent = `Final Score: ${totalScore}/${targetScore}`;
+            this.totalScoreElement.classList.add('target-missed');
+            this.totalScoreElement.textContent = `Final Score: ${totalScore}/${targetScore}`;
         }
     }
     

@@ -72,7 +72,7 @@ export class GameEngine {
         this.render();
         
         // Animate the score calculation after rendering
-        this.renderer.animateScore(this.gameState.tokens, this.gameState.scoreBreakdown, this.gameState.targetColors);
+        this.renderer.animateScore(this.gameState);
         
         // Check if round is over but game isn't completely over
         if (this.gameState.isRoundOver && !this.gameState.isGameOver) {
