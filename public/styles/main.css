@@ -564,131 +564,160 @@ h1 {
 .cards-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 15px;
     justify-content: center;
     margin-bottom: 15px;
     min-height: 120px;
 }
 
 .card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
-    padding: 15px;
-    width: 150px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 20px 16px;
+    width: 140px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .card-icon {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 15px;
+    width: 70px;
+    height: 70px;
+    margin-bottom: 12px;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* Single Flip Icon - One circle with arrows */
-.icon-single-flip::before {
-    content: '';
-    width: 40px;
-    height: 40px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
     border-radius: 50%;
-    border: 3px solid #fff;
-    position: absolute;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
 }
 
-.icon-single-flip::after {
-    content: '⟲';
-    font-size: 2em;
+/* Single Flip Icon - Minimalist circular arrow */
+.icon-single-flip::before {
+    content: '↻';
+    font-size: 2.5em;
     color: #fff;
-    position: absolute;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    font-weight: 300;
+    text-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
 }
 
-/* Adjacent Flip Icon - Three circles */
+/* Adjacent Flip Icon - Three connected dots */
 .icon-adjacent-flip::before {
     content: '';
-    width: 24px;
-    height: 24px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    border: 2px solid #fff;
+    background: #fff;
     position: absolute;
     box-shadow: 
-        -28px 0 0 -2px rgba(255, 255, 255, 0.6),
-        -28px 0 0 0px #fff,
-        28px 0 0 -2px rgba(255, 255, 255, 0.6),
-        28px 0 0 0px #fff,
-        0 0 10px rgba(255, 255, 255, 0.5);
+        -18px 0 0 0 rgba(255, 255, 255, 0.6),
+        18px 0 0 0 rgba(255, 255, 255, 0.6),
+        0 0 8px rgba(255, 255, 255, 0.6);
 }
 
 .icon-adjacent-flip::after {
-    content: '⟲';
-    font-size: 1.5em;
-    color: #fff;
+    content: '';
     position: absolute;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    width: 36px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-/* Row Flip Icon - Five small circles */
+/* Row Flip Icon - Five dots in a row */
 .icon-row-flip::before {
     content: '';
-    width: 16px;
-    height: 16px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    border: 2px solid #fff;
+    background: #fff;
     position: absolute;
     box-shadow: 
-        -24px 0 0 -2px rgba(255, 255, 255, 0.6),
-        -24px 0 0 0px #fff,
-        -12px 0 0 -2px rgba(255, 255, 255, 0.6),
-        -12px 0 0 0px #fff,
-        12px 0 0 -2px rgba(255, 255, 255, 0.6),
-        12px 0 0 0px #fff,
-        24px 0 0 -2px rgba(255, 255, 255, 0.6),
-        24px 0 0 0px #fff,
-        0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-.icon-row-flip::after {
-    content: '⟲';
-    font-size: 1.8em;
-    color: #fff;
-    position: absolute;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        -20px 0 0 0 rgba(255, 255, 255, 0.5),
+        -10px 0 0 0 rgba(255, 255, 255, 0.7),
+        10px 0 0 0 rgba(255, 255, 255, 0.7),
+        20px 0 0 0 rgba(255, 255, 255, 0.5),
+        0 0 8px rgba(255, 255, 255, 0.6);
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 12px 24px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+}
+
+.card:hover::before {
+    opacity: 1;
+}
+
+.card:hover .card-icon {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 .card.selected {
-    border-color: #ffd700;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.2));
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    border-color: #4ecca3;
+    background: linear-gradient(145deg, rgba(78, 204, 163, 0.25), rgba(78, 204, 163, 0.15));
+    box-shadow: 
+        0 8px 20px rgba(78, 204, 163, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-4px);
+}
+
+.card.selected::before {
+    background: linear-gradient(90deg, #4ecca3, #45b393);
+    opacity: 1;
+}
+
+.card.selected .card-icon {
+    background: linear-gradient(135deg, rgba(78, 204, 163, 0.3), rgba(69, 179, 147, 0.3));
+    border-color: #4ecca3;
+    box-shadow: 0 0 15px rgba(78, 204, 163, 0.4);
 }
 
 .card-name {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 8px;
     color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.3px;
 }
 
 .card-description {
-    font-size: 0.9em;
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.4;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.5;
+    text-align: center;
 }
 
 .empty-hand-message {
