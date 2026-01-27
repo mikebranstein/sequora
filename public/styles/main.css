@@ -852,6 +852,11 @@ h1 {
     position: relative;
     width: 160px;
     height: 220px;
+    z-index: 1;
+}
+
+.deck-card-stack:hover {
+    z-index: 10;
 }
 
 .deck-card {
@@ -882,8 +887,8 @@ h1 {
 
 .deck-card-stack:hover .deck-card {
     transform: 
-        translateX(0px)
-        translateY(calc(var(--stack-index) * 60px))
+        translateX(calc(var(--stack-index) * 50px))
+        translateY(0px)
         rotate(0deg);
     box-shadow: 
         0 8px 20px rgba(0, 0, 0, 0.25),
