@@ -796,6 +796,11 @@ class GameRenderer {
         const overallTarget = gameState.targetScore;
         const progressPercent = Math.min(100, (totalScore / overallTarget) * 100);
         const waveMet = waveScore >= waveTarget;
+        // Calculate wave statistics
+        const trialScores = gameState.trialScores;
+        const avgScore = trialScores.length > 0 ? Math.round(trialScores.reduce((a, b) => a + b, 0) / trialScores.length) : 0;
+        const bestScore = trialScores.length > 0 ? Math.max(...trialScores) : 0;
+        const trialsCompleted = trialScores.length;
         this.waveCompleteOverlay.innerHTML = `
             <div class="wave-complete-content">
                 <h2>🌊 Wave ${waveNumber} Complete! 🌊</h2>
@@ -805,6 +810,21 @@ class GameRenderer {
                         <div class="wave-score-value">${waveScore}</div>
                         <div class="wave-score-target">Target: ${waveTarget}</div>
                         ${waveMet ? '<div class="wave-badge">✨ Target Met! ✨</div>' : '<div class="wave-badge-miss">Keep Going!</div>'}
+                        
+                        <div class="wave-stats">
+                            <div class="wave-stat-item">
+                                <span class="stat-label">Trials</span>
+                                <span class="stat-value">${trialsCompleted}</span>
+                            </div>
+                            <div class="wave-stat-item">
+                                <span class="stat-label">Best</span>
+                                <span class="stat-value">${bestScore}</span>
+                            </div>
+                            <div class="wave-stat-item">
+                                <span class="stat-label">Average</span>
+                                <span class="stat-value">${avgScore}</span>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="trial-results">
@@ -1022,24 +1042,112 @@ class GameRenderer {
     }
     renderDeck(deck, currentHand) {
         this.deckCardsContainer.innerHTML = '';
-        deck.forEach((card) => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'deck-card';
-            // Mark cards that are currently in hand
-            const isInHand = currentHand.some(c => c.id === card.id);
-            if (isInHand) {
-                cardElement.classList.add('in-hand');
+        // Calculate deck statistics
+        const totalCards = deck.length;
+        const cardsInHand = currentHand.length;
+        const cardsRemaining = totalCards - cardsInHand;
+        // Add deck summary header
+        const deckSummary = document.createElement('div');
+        deckSummary.className = 'deck-summary';
+        deckSummary.innerHTML = `
+            <div class="deck-stat">
+                <span class="deck-stat-label">Total Cards</span>
+                <span class="deck-stat-value">${totalCards}</span>
+            </div>
+            <div class="deck-stat">
+                <span class="deck-stat-label">In Hand</span>
+                <span class="deck-stat-value">${cardsInHand}</span>
+            </div>
+            <div class="deck-stat">
+                <span class="deck-stat-label">Remaining</span>
+                <span class="deck-stat-value">${cardsRemaining}</span>
+            </div>
+        `;
+        this.deckCardsContainer.appendChild(deckSummary);
+        // Create container for card groups
+        const groupsContainer = document.createElement('div');
+        groupsContainer.className = 'deck-groups-container';
+        // Group cards by type
+        const cardGroups = new Map();
+        deck.forEach(card => {
+            if (!cardGroups.has(card.name)) {
+                cardGroups.set(card.name, []);
             }
-            const cardName = document.createElement('div');
-            cardName.className = 'deck-card-name';
-            cardName.textContent = card.name;
-            const cardDescription = document.createElement('div');
-            cardDescription.className = 'deck-card-description';
-            cardDescription.textContent = card.description;
-            cardElement.appendChild(cardName);
-            cardElement.appendChild(cardDescription);
-            this.deckCardsContainer.appendChild(cardElement);
+            cardGroups.get(card.name).push(card);
         });
+        // Render each group
+        cardGroups.forEach((cards, cardName) => {
+            const groupContainer = document.createElement('div');
+            groupContainer.className = 'deck-card-group';
+            // Calculate stats for this card type
+            const cardsOfTypeInHand = currentHand.filter(c => c.name === cardName).length;
+            const cardsOfTypeRemaining = cards.length - cardsOfTypeInHand;
+            const currentDrawChance = cardsRemaining > 0 ? ((cardsOfTypeRemaining / cardsRemaining) * 100).toFixed(1) : '0';
+            const overallDrawChance = totalCards > 0 ? ((cards.length / totalCards) * 100).toFixed(1) : '0';
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'deck-group-header';
+            groupHeader.textContent = cardName;
+            groupContainer.appendChild(groupHeader);
+            // Add card type statistics
+            const groupStats = document.createElement('div');
+            groupStats.className = 'deck-group-stats';
+            groupStats.innerHTML = `
+                <div class="group-stat-item">
+                    <span class="group-stat-label">Total:</span>
+                    <span class="group-stat-value">${cards.length}</span>
+                </div>
+                <div class="group-stat-item">
+                    <span class="group-stat-label">In Hand:</span>
+                    <span class="group-stat-value">${cardsOfTypeInHand}</span>
+                </div>
+                <div class="group-stat-item">
+                    <span class="group-stat-label">Current Draw:</span>
+                    <span class="group-stat-value">${currentDrawChance}%</span>
+                </div>
+                <div class="group-stat-item">
+                    <span class="group-stat-label">Overall:</span>
+                    <span class="group-stat-value">${overallDrawChance}%</span>
+                </div>
+            `;
+            groupContainer.appendChild(groupStats);
+            const stackContainer = document.createElement('div');
+            stackContainer.className = 'deck-card-stack';
+            // Create stacked cards (show first 3, then count badge if more)
+            cards.slice(0, 3).forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'deck-card';
+                cardElement.style.setProperty('--stack-index', index.toString());
+                const isInHand = currentHand.some(c => c.id === card.id);
+                if (isInHand) {
+                    cardElement.classList.add('in-hand');
+                }
+                // Add icon based on card type
+                const cardIcon = document.createElement('div');
+                cardIcon.className = 'card-icon';
+                if (card.name === 'Single Flip') {
+                    cardIcon.classList.add('icon-single-flip');
+                }
+                else if (card.name === 'Adjacent Flip') {
+                    cardIcon.classList.add('icon-adjacent-flip');
+                }
+                else if (card.name === 'Row Flip') {
+                    cardIcon.classList.add('icon-row-flip');
+                }
+                const cardNameEl = document.createElement('div');
+                cardNameEl.className = 'deck-card-name';
+                cardNameEl.textContent = card.name;
+                const cardDescription = document.createElement('div');
+                cardDescription.className = 'deck-card-description';
+                cardDescription.textContent = card.description;
+                cardElement.appendChild(cardIcon);
+                cardElement.appendChild(cardNameEl);
+                cardElement.appendChild(cardDescription);
+                stackContainer.appendChild(cardElement);
+            });
+            groupContainer.appendChild(stackContainer);
+            groupsContainer.appendChild(groupContainer);
+        });
+        this.deckCardsContainer.appendChild(groupsContainer);
     }
     setSelectedCard(card) {
         this.selectedCard = card;
