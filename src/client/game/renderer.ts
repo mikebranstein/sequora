@@ -619,7 +619,8 @@ export class GameRenderer {
             // Calculate stats for this card type
             const cardsOfTypeInHand = currentHand.filter(c => c.name === cardName).length;
             const cardsOfTypeRemaining = cards.length - cardsOfTypeInHand;
-            const drawChance = cardsRemaining > 0 ? ((cardsOfTypeRemaining / cardsRemaining) * 100).toFixed(1) : '0';
+            const currentDrawChance = cardsRemaining > 0 ? ((cardsOfTypeRemaining / cardsRemaining) * 100).toFixed(1) : '0';
+            const overallDrawChance = totalCards > 0 ? ((cards.length / totalCards) * 100).toFixed(1) : '0';
             
             const groupHeader = document.createElement('div');
             groupHeader.className = 'deck-group-header';
@@ -639,8 +640,12 @@ export class GameRenderer {
                     <span class="group-stat-value">${cardsOfTypeInHand}</span>
                 </div>
                 <div class="group-stat-item">
-                    <span class="group-stat-label">Draw Chance:</span>
-                    <span class="group-stat-value">${drawChance}%</span>
+                    <span class="group-stat-label">Current Draw:</span>
+                    <span class="group-stat-value">${currentDrawChance}%</span>
+                </div>
+                <div class="group-stat-item">
+                    <span class="group-stat-label">Overall:</span>
+                    <span class="group-stat-value">${overallDrawChance}%</span>
                 </div>
             `;
             groupContainer.appendChild(groupStats);
