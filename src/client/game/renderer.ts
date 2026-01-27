@@ -574,6 +574,34 @@ export class GameRenderer {
     private renderDeck(deck: Card[], currentHand: Card[]): void {
         this.deckCardsContainer.innerHTML = '';
         
+        // Calculate deck statistics
+        const totalCards = deck.length;
+        const cardsInHand = currentHand.length;
+        const cardsRemaining = totalCards - cardsInHand;
+        
+        // Add deck summary header
+        const deckSummary = document.createElement('div');
+        deckSummary.className = 'deck-summary';
+        deckSummary.innerHTML = `
+            <div class="deck-stat">
+                <span class="deck-stat-label">Total Cards</span>
+                <span class="deck-stat-value">${totalCards}</span>
+            </div>
+            <div class="deck-stat">
+                <span class="deck-stat-label">In Hand</span>
+                <span class="deck-stat-value">${cardsInHand}</span>
+            </div>
+            <div class="deck-stat">
+                <span class="deck-stat-label">Remaining</span>
+                <span class="deck-stat-value">${cardsRemaining}</span>
+            </div>
+        `;
+        this.deckCardsContainer.appendChild(deckSummary);
+        
+        // Create container for card groups
+        const groupsContainer = document.createElement('div');
+        groupsContainer.className = 'deck-groups-container';
+        
         // Group cards by type
         const cardGroups = new Map<string, Card[]>();
         deck.forEach(card => {
@@ -588,10 +616,34 @@ export class GameRenderer {
             const groupContainer = document.createElement('div');
             groupContainer.className = 'deck-card-group';
             
+            // Calculate stats for this card type
+            const cardsOfTypeInHand = currentHand.filter(c => c.name === cardName).length;
+            const cardsOfTypeRemaining = cards.length - cardsOfTypeInHand;
+            const drawChance = cardsRemaining > 0 ? ((cardsOfTypeRemaining / cardsRemaining) * 100).toFixed(1) : '0';
+            
             const groupHeader = document.createElement('div');
             groupHeader.className = 'deck-group-header';
-            groupHeader.textContent = `${cardName} (${cards.length})`;
+            groupHeader.textContent = cardName;
             groupContainer.appendChild(groupHeader);
+            
+            // Add card type statistics
+            const groupStats = document.createElement('div');
+            groupStats.className = 'deck-group-stats';
+            groupStats.innerHTML = `
+                <div class="group-stat-item">
+                    <span class="group-stat-label">Total:</span>
+                    <span class="group-stat-value">${cards.length}</span>
+                </div>
+                <div class="group-stat-item">
+                    <span class="group-stat-label">In Hand:</span>
+                    <span class="group-stat-value">${cardsOfTypeInHand}</span>
+                </div>
+                <div class="group-stat-item">
+                    <span class="group-stat-label">Draw Chance:</span>
+                    <span class="group-stat-value">${drawChance}%</span>
+                </div>
+            `;
+            groupContainer.appendChild(groupStats);
             
             const stackContainer = document.createElement('div');
             stackContainer.className = 'deck-card-stack';
@@ -634,8 +686,10 @@ export class GameRenderer {
             });
             
             groupContainer.appendChild(stackContainer);
-            this.deckCardsContainer.appendChild(groupContainer);
+            groupsContainer.appendChild(groupContainer);
         });
+        
+        this.deckCardsContainer.appendChild(groupsContainer);
     }
 
     public setSelectedCard(card: Card | null): void {
