@@ -828,11 +828,6 @@ h1 {
     gap: 30px;
     justify-content: center;
     align-items: flex-start;
-    transition: filter 0.3s ease;
-}
-
-.deck-cards-container:has(.deck-card-stack:hover) {
-    filter: blur(3px);
 }
 
 .deck-card-group {
@@ -843,13 +838,12 @@ h1 {
     transition: filter 0.3s ease;
 }
 
-.deck-card-stack:hover .deck-card-group,
-.deck-card-group:has(.deck-card-stack:hover) {
-    filter: blur(0);
+.deck-cards-container:has(.deck-card-stack:hover) .deck-card-group {
+    filter: blur(3px);
 }
 
-.deck-card-stack:hover {
-    filter: blur(0);
+.deck-card-group:has(.deck-card-stack:hover) {
+    filter: blur(0) !important;
 }
 
 .deck-group-header {
@@ -868,12 +862,10 @@ h1 {
     width: 160px;
     height: 220px;
     z-index: 1;
-    transition: filter 0.3s ease;
 }
 
 .deck-card-stack:hover {
     z-index: 10;
-    filter: blur(0) !important;
 }
 
 .deck-card {
