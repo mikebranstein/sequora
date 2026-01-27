@@ -875,16 +875,19 @@ h1 {
 
 .deck-card-stack .deck-card {
     transform: 
-        translateX(calc(var(--stack-index) * 8px))
-        translateY(calc(var(--stack-index) * 8px))
+        translateX(calc(var(--stack-index) * 6px))
+        translateY(calc(var(--stack-index) * 6px))
         rotate(calc(var(--stack-index) * 2deg));
 }
 
 .deck-card-stack:hover .deck-card {
     transform: 
-        translateX(calc(var(--stack-index) * 50px))
-        translateY(0px)
+        translateX(0px)
+        translateY(calc(var(--stack-index) * 60px))
         rotate(0deg);
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .deck-card .card-icon {
