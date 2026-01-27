@@ -304,6 +304,12 @@ export class GameRenderer {
         const progressPercent = Math.min(100, (totalScore / overallTarget) * 100);
         const waveMet = waveScore >= waveTarget;
         
+        // Calculate wave statistics
+        const trialScores = gameState.trialScores;
+        const avgScore = trialScores.length > 0 ? Math.round(trialScores.reduce((a, b) => a + b, 0) / trialScores.length) : 0;
+        const bestScore = trialScores.length > 0 ? Math.max(...trialScores) : 0;
+        const trialsCompleted = trialScores.length;
+        
         this.waveCompleteOverlay.innerHTML = `
             <div class="wave-complete-content">
                 <h2>🌊 Wave ${waveNumber} Complete! 🌊</h2>
@@ -313,6 +319,21 @@ export class GameRenderer {
                         <div class="wave-score-value">${waveScore}</div>
                         <div class="wave-score-target">Target: ${waveTarget}</div>
                         ${waveMet ? '<div class="wave-badge">✨ Target Met! ✨</div>' : '<div class="wave-badge-miss">Keep Going!</div>'}
+                        
+                        <div class="wave-stats">
+                            <div class="wave-stat-item">
+                                <span class="stat-label">Trials</span>
+                                <span class="stat-value">${trialsCompleted}</span>
+                            </div>
+                            <div class="wave-stat-item">
+                                <span class="stat-label">Best</span>
+                                <span class="stat-value">${bestScore}</span>
+                            </div>
+                            <div class="wave-stat-item">
+                                <span class="stat-label">Average</span>
+                                <span class="stat-value">${avgScore}</span>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="trial-results">
