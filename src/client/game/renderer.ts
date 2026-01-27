@@ -574,28 +574,67 @@ export class GameRenderer {
     private renderDeck(deck: Card[], currentHand: Card[]): void {
         this.deckCardsContainer.innerHTML = '';
         
-        deck.forEach((card) => {
-            const cardElement = document.createElement('div');
-            cardElement.className = 'deck-card';
-            
-            // Mark cards that are currently in hand
-            const isInHand = currentHand.some(c => c.id === card.id);
-            if (isInHand) {
-                cardElement.classList.add('in-hand');
+        // Group cards by type
+        const cardGroups = new Map<string, Card[]>();
+        deck.forEach(card => {
+            if (!cardGroups.has(card.name)) {
+                cardGroups.set(card.name, []);
             }
-
-            const cardName = document.createElement('div');
-            cardName.className = 'deck-card-name';
-            cardName.textContent = card.name;
-
-            const cardDescription = document.createElement('div');
-            cardDescription.className = 'deck-card-description';
-            cardDescription.textContent = card.description;
-
-            cardElement.appendChild(cardName);
-            cardElement.appendChild(cardDescription);
-
-            this.deckCardsContainer.appendChild(cardElement);
+            cardGroups.get(card.name)!.push(card);
+        });
+        
+        // Render each group
+        cardGroups.forEach((cards, cardName) => {
+            const groupContainer = document.createElement('div');
+            groupContainer.className = 'deck-card-group';
+            
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'deck-group-header';
+            groupHeader.textContent = `${cardName} (${cards.length})`;
+            groupContainer.appendChild(groupHeader);
+            
+            const stackContainer = document.createElement('div');
+            stackContainer.className = 'deck-card-stack';
+            
+            // Create stacked cards (show first 3, then count badge if more)
+            cards.slice(0, 3).forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'deck-card';
+                cardElement.style.setProperty('--stack-index', index.toString());
+                
+                const isInHand = currentHand.some(c => c.id === card.id);
+                if (isInHand) {
+                    cardElement.classList.add('in-hand');
+                }
+                
+                // Add icon based on card type
+                const cardIcon = document.createElement('div');
+                cardIcon.className = 'card-icon';
+                if (card.name === 'Single Flip') {
+                    cardIcon.classList.add('icon-single-flip');
+                } else if (card.name === 'Adjacent Flip') {
+                    cardIcon.classList.add('icon-adjacent-flip');
+                } else if (card.name === 'Row Flip') {
+                    cardIcon.classList.add('icon-row-flip');
+                }
+                
+                const cardNameEl = document.createElement('div');
+                cardNameEl.className = 'deck-card-name';
+                cardNameEl.textContent = card.name;
+                
+                const cardDescription = document.createElement('div');
+                cardDescription.className = 'deck-card-description';
+                cardDescription.textContent = card.description;
+                
+                cardElement.appendChild(cardIcon);
+                cardElement.appendChild(cardNameEl);
+                cardElement.appendChild(cardDescription);
+                
+                stackContainer.appendChild(cardElement);
+            });
+            
+            groupContainer.appendChild(stackContainer);
+            this.deckCardsContainer.appendChild(groupContainer);
         });
     }
 
